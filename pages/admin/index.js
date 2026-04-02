@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import UploadFoto from '../../components/UploadFoto';
 
 const produtoVazio = { nome: '', marca: '', descricao: '', linha: 'feminino', tipo: 'floral', foto: '', destaque: false, ativo: true };
 const kitVazio = { nome: '', descricao: '', ocasiao: '', foto: '', ativo: true };
@@ -130,7 +131,6 @@ export default function Admin() {
         <a href="/" style={styles.voltar}>← Ver site</a>
       </header>
 
-      {/* Abas */}
       <div style={styles.abas}>
         <button style={{ ...styles.aba, ...(aba === 'produtos' ? styles.abaAtiva : {}) }} onClick={() => setAba('produtos')}>
           📦 Produtos ({produtos.length})
@@ -174,12 +174,13 @@ export default function Admin() {
                 </div>
                 <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
                   <label style={styles.label}>Descrição</label>
-                  <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formProduto.descricao} onChange={e => setFormProduto({ ...formProduto, descricao: e.target.value })} />
+                  <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formProduto.descricao} onChange={e => setFormProduto({ ...formProduto, descricao: e.target.value })} placeholder="Descreva o produto..." />
                 </div>
                 <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                  <label style={styles.label}>URL da Foto</label>
-                  <input style={styles.input} value={formProduto.foto} onChange={e => setFormProduto({ ...formProduto, foto: e.target.value })} placeholder="https://..." />
-                  {formProduto.foto && <img src={formProduto.foto} alt="preview" style={{ marginTop: 8, height: 80, borderRadius: 8, objectFit: 'cover' }} />}
+                  <UploadFoto
+                    fotoAtual={formProduto.foto}
+                    onUpload={(url) => setFormProduto({ ...formProduto, foto: url })}
+                  />
                 </div>
               </div>
               <div style={styles.checks}>
@@ -198,6 +199,7 @@ export default function Admin() {
                 <div style={styles.lista}>
                   {produtos.map(p => (
                     <div key={p.id} style={{ ...styles.item, opacity: p.ativo ? 1 : 0.5 }}>
+                      {p.foto && <img src={p.foto} alt={p.nome} style={styles.itemFoto} />}
                       <div style={styles.itemInfo}>
                         <strong>{p.nome}</strong>
                         <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
@@ -239,13 +241,13 @@ export default function Admin() {
                   <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formKit.descricao} onChange={e => setFormKit({ ...formKit, descricao: e.target.value })} placeholder="Descreva o kit..." />
                 </div>
                 <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                  <label style={styles.label}>URL da Foto</label>
-                  <input style={styles.input} value={formKit.foto} onChange={e => setFormKit({ ...formKit, foto: e.target.value })} placeholder="https://..." />
-                  {formKit.foto && <img src={formKit.foto} alt="preview" style={{ marginTop: 8, height: 80, borderRadius: 8, objectFit: 'cover' }} />}
+                  <UploadFoto
+                    fotoAtual={formKit.foto}
+                    onUpload={(url) => setFormKit({ ...formKit, foto: url })}
+                  />
                 </div>
               </div>
 
-              {/* Seleção de produtos do kit */}
               <div style={{ marginTop: 24 }}>
                 <label style={styles.label}>Produtos do Kit ({produtosDoKit.length} selecionados)</label>
                 <div style={styles.gridSelecao}>
@@ -257,7 +259,7 @@ export default function Admin() {
                         style={{ ...styles.cardSelecao, border: selecionado ? '2px solid var(--verde)' : '2px solid #eee', background: selecionado ? '#f0f4ea' : '#fff' }}
                         onClick={() => toggleProdutoKit(p.id)}
                       >
-                        <span style={styles.checkSelecao}>{selecionado ? '✓' : '+'}</span>
+                        <span style={{ ...styles.checkSelecao, background: selecionado ? '#78825B' : '#ddd' }}>{selecionado ? '✓' : '+'}</span>
                         <div>
                           <p style={{ fontWeight: 600, fontSize: 13 }}>{p.nome}</p>
                           <p style={{ fontSize: 11, color: '#888' }}>{p.marca}</p>
@@ -285,6 +287,7 @@ export default function Admin() {
                 <div style={styles.lista}>
                   {kits.map(k => (
                     <div key={k.id} style={{ ...styles.item, opacity: k.ativo ? 1 : 0.5 }}>
+                      {k.foto && <img src={k.foto} alt={k.nome} style={styles.itemFoto} />}
                       <div style={styles.itemInfo}>
                         <strong>{k.nome}</strong>
                         <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
@@ -332,9 +335,10 @@ const styles = {
   btnCancelar: { background: 'none', color: '#999', padding: '12px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14, border: '2px solid #eee', cursor: 'pointer' },
   gridSelecao: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10, marginTop: 10 },
   cardSelecao: { padding: '10px 14px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.2s' },
-  checkSelecao: { width: 24, height: 24, borderRadius: '50%', background: 'var(--verde)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0 },
+  checkSelecao: { width: 24, height: 24, borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0 },
   lista: { display: 'flex', flexDirection: 'column', gap: 12 },
   item: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderRadius: 10, border: '1px solid #eee', flexWrap: 'wrap', gap: 8 },
+  itemFoto: { width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0 },
   itemInfo: { flex: 1 },
   tag: { fontSize: 11, background: '#f0f0f0', padding: '3px 8px', borderRadius: 20, color: '#666' },
   itemAcoes: { display: 'flex', gap: 8 },
