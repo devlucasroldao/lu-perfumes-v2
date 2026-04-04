@@ -7,6 +7,7 @@ export default function Navbar({ sacolaCount = 0 }) {
   const [linhaOpen, setLinhaOpen] = useState(false);
   const [marcaOpen, setMarcaOpen] = useState(false);
   const [tipoOpen, setTipoOpen] = useState(false);
+  const [usuarioOpen, setUsuarioOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [usuario, setUsuario] = useState(null);
 
@@ -17,7 +18,19 @@ export default function Navbar({ sacolaCount = 0 }) {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUsuario(session?.user || null);
     });
-    return () => listener.subscription.unsubscribe();
+
+    // Fecha dropdowns ao clicar fora
+    const fecharTodos = () => {
+      setLinhaOpen(false);
+      setMarcaOpen(false);
+      setTipoOpen(false);
+      setUsuarioOpen(false);
+    };
+    document.addEventListener('click', fecharTodos);
+    return () => {
+      listener.subscription.unsubscribe();
+      document.removeEventListener('click', fecharTodos);
+    };
   }, []);
 
   const sair = async () => {
@@ -25,15 +38,19 @@ export default function Navbar({ sacolaCount = 0 }) {
     setUsuario(null);
   };
 
+  const stopPropagation = (e) => e.stopPropagation();
+
   return (
     <>
-      <nav style={styles.nav}>
+      <nav style={styles.nav} onClick={stopPropagation}>
         <div style={styles.container}>
           <Link href="/" style={styles.logo}>🌸 Lu Perfumes & Presentes</Link>
 
           <div style={styles.links}>
             <div style={styles.dropdown}>
-              <span style={styles.link} onClick={() => { setLinhaOpen(!linhaOpen); setMarcaOpen(false); setTipoOpen(false); }}>Por Linha ▾</span>
+              <span style={styles.link} onClick={() => { setLinhaOpen(!linhaOpen); setMarcaOpen(false); setTipoOpen(false); setUsuarioOpen(false); }}>
+                Por Linha ▾
+              </span>
               {linhaOpen && (
                 <div style={styles.dropMenu}>
                   {['feminino','masculino','kids','baby'].map(l => (
@@ -46,22 +63,30 @@ export default function Navbar({ sacolaCount = 0 }) {
             </div>
 
             <div style={styles.dropdown}>
-              <span style={styles.link} onClick={() => { setMarcaOpen(!marcaOpen); setLinhaOpen(false); setTipoOpen(false); }}>Por Marca ▾</span>
+              <span style={styles.link} onClick={() => { setMarcaOpen(!marcaOpen); setLinhaOpen(false); setTipoOpen(false); setUsuarioOpen(false); }}>
+                Por Marca ▾
+              </span>
               {marcaOpen && (
                 <div style={styles.dropMenu}>
                   {['O Boticário','Natura','Eudora','Avon','Mary Kay'].map(m => (
-                    <Link key={m} href={`/catalogo?marca=${m}`} style={styles.dropItem} onClick={() => setMarcaOpen(false)}>{m}</Link>
+                    <Link key={m} href={`/catalogo?marca=${m}`} style={styles.dropItem} onClick={() => setMarcaOpen(false)}>
+                      {m}
+                    </Link>
                   ))}
                 </div>
               )}
             </div>
 
             <div style={styles.dropdown}>
-              <span style={styles.link} onClick={() => { setTipoOpen(!tipoOpen); setLinhaOpen(false); setMarcaOpen(false); }}>Por Tipo ▾</span>
+              <span style={styles.link} onClick={() => { setTipoOpen(!tipoOpen); setLinhaOpen(false); setMarcaOpen(false); setUsuarioOpen(false); }}>
+                Por Tipo ▾
+              </span>
               {tipoOpen && (
                 <div style={styles.dropMenu}>
                   {['Floral','Amadeirado','Cítrico','Doce','Frutal'].map(t => (
-                    <Link key={t} href={`/catalogo?tipo=${t.toLowerCase()}`} style={styles.dropItem} onClick={() => setTipoOpen(false)}>{t}</Link>
+                    <Link key={t} href={`/catalogo?tipo=${t.toLowerCase()}`} style={styles.dropItem} onClick={() => setTipoOpen(false)}>
+                      {t}
+                    </Link>
                   ))}
                 </div>
               )}
@@ -73,11 +98,15 @@ export default function Navbar({ sacolaCount = 0 }) {
           <div style={styles.acoes}>
             {usuario ? (
               <div style={styles.dropdown}>
-                <span style={styles.usuarioBtn}>👤 {usuario.email.split('@')[0]}</span>
-                <div style={styles.dropMenu}>
-                  <Link href="/favoritos" style={styles.dropItem}>♡ Favoritos</Link>
-                  <span style={{ ...styles.dropItem, color: 'var(--rosa)', cursor: 'pointer' }} onClick={sair}>Sair</span>
-                </div>
+                <span style={styles.usuarioBtn} onClick={() => { setUsuarioOpen(!usuarioOpen); setLinhaOpen(false); setMarcaOpen(false); setTipoOpen(false); }}>
+                  👤 {usuario.email.split('@')[0]}
+                </span>
+                {usuarioOpen && (
+                  <div style={{ ...styles.dropMenu, right: 0, left: 'auto' }}>
+                    <Link href="/favoritos" style={styles.dropItem} onClick={() => setUsuarioOpen(false)}>♡ Favoritos</Link>
+                    <span style={{ ...styles.dropItem, color: 'var(--rosa)', cursor: 'pointer' }} onClick={() => { sair(); setUsuarioOpen(false); }}>Sair</span>
+                  </div>
+                )}
               </div>
             ) : (
               <button style={styles.btnLogin} onClick={() => setModalOpen(true)}>Entrar</button>
