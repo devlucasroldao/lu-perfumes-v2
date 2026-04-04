@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import AuthModal from './AuthModal';
+import Busca from './Busca';
 
 export default function Navbar({ sacolaCount = 0 }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -83,9 +84,14 @@ export default function Navbar({ sacolaCount = 0 }) {
             <Link href="/kits" style={styles.link}>Kits 🎁</Link>
           </div>
 
+          {/* Busca desktop */}
+          <div style={styles.buscaWrapper} className="nav-links">
+            <Busca />
+          </div>
+
           <div style={styles.acoes}>
             {/* Usuario desktop */}
-            <div style={{ ...styles.dropdown }} className="nav-links">
+            <div style={styles.dropdown} className="nav-links">
               {usuario ? (
                 <>
                   <span style={styles.usuarioBtn} onClick={() => { setUsuarioOpen(!usuarioOpen); setLinhaOpen(false); setMarcaOpen(false); setTipoOpen(false); }}>
@@ -122,6 +128,9 @@ export default function Navbar({ sacolaCount = 0 }) {
         {/* Menu mobile */}
         {menuOpen && (
           <div style={styles.menuMobile}>
+            <div style={{ padding: '12px 16px' }}>
+              <Busca />
+            </div>
             <Link href="/catalogo?linha=feminino" style={styles.menuItem} onClick={() => setMenuOpen(false)}>👩 Feminino</Link>
             <Link href="/catalogo?linha=masculino" style={styles.menuItem} onClick={() => setMenuOpen(false)}>👨 Masculino</Link>
             <Link href="/catalogo?linha=kids" style={styles.menuItem} onClick={() => setMenuOpen(false)}>👧 Kids</Link>
@@ -158,14 +167,15 @@ export default function Navbar({ sacolaCount = 0 }) {
 
 const styles = {
   nav: { background: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', position: 'sticky', top: 0, zIndex: 100 },
-  container: { maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  container: { maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
   logo: { fontWeight: 700, fontSize: 18, color: 'var(--verde)', flexShrink: 0 },
-  links: { display: 'flex', gap: 32, alignItems: 'center' },
+  links: { display: 'flex', gap: 24, alignItems: 'center', flexShrink: 0 },
   link: { fontSize: 14, fontWeight: 500, color: 'var(--texto)', cursor: 'pointer', whiteSpace: 'nowrap' },
   dropdown: { position: 'relative' },
   dropMenu: { position: 'absolute', top: '100%', left: 0, background: '#fff', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', borderRadius: 8, padding: '8px 0', minWidth: 160, display: 'flex', flexDirection: 'column', zIndex: 200 },
   dropItem: { padding: '10px 16px', fontSize: 14, color: 'var(--texto)' },
-  acoes: { display: 'flex', gap: 16, alignItems: 'center' },
+  buscaWrapper: { flex: 1, maxWidth: 360 },
+  acoes: { display: 'flex', gap: 16, alignItems: 'center', flexShrink: 0 },
   usuarioBtn: { fontSize: 14, fontWeight: 600, color: 'var(--verde)', cursor: 'pointer', whiteSpace: 'nowrap' },
   btnLogin: { background: 'var(--rosa)', color: '#fff', padding: '8px 20px', borderRadius: 50, fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer' },
   sacolaBtn: { position: 'relative', fontSize: 20 },

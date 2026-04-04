@@ -28,6 +28,7 @@ export default function Catalogo() {
     if (router.query.linha) setFiltroLinha(router.query.linha);
     if (router.query.marca) setFiltroMarca(router.query.marca);
     if (router.query.tipo) setFiltroTipo(router.query.tipo);
+    if (router.query.busca) setBusca(router.query.busca);
   }, [router.query]);
 
   const buscarProdutos = async () => {
@@ -53,7 +54,7 @@ export default function Catalogo() {
     const matchMarca = filtroMarca === 'Todos' || p.marca === filtroMarca;
     const matchTipo = filtroTipo === 'Todos' || p.tipo === filtroTipo;
     const matchBusca = p.nome.toLowerCase().includes(busca.toLowerCase()) ||
-                       p.marca.toLowerCase().includes(busca.toLowerCase());
+      p.marca.toLowerCase().includes(busca.toLowerCase());
     return matchLinha && matchMarca && matchTipo && matchBusca;
   });
 
