@@ -42,7 +42,7 @@ export default function Kits() {
     };
 
     const enviarKitPronto = (kit) => {
-        const numero = '5551999999999'; // ← troca pelo número da Lu
+        const numero = '5551980272657'; 
         const itens = kit.kit_produtos?.map(kp => `• ${kp.produtos?.nome} - ${kp.produtos?.marca}`).join('\n') || '';
         const mensagem = `Olá Lu! 🌸 Tenho interesse no kit *${kit.nome}*:\n\n${itens}\n\nPoderia me passar mais informações?`;
         window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
@@ -50,7 +50,7 @@ export default function Kits() {
 
     const enviarKitPersonalizado = () => {
         if (kitPersonalizado.length === 0) return;
-        const numero = '5551999999999'; // ← troca pelo número da Lu
+        const numero = '5551980272657'; 
         const itens = kitPersonalizado.map(p => `• ${p.nome} - ${p.marca}`).join('\n');
         const mensagem = `Olá Lu! 🌸 Gostaria de montar um kit com esses produtos:\n\n${itens}\n\nPoderia me ajudar?`;
         window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');

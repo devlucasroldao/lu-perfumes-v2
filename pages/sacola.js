@@ -23,7 +23,7 @@ export default function Sacola() {
 
   const enviarWhatsApp = () => {
     if (sacola.length === 0) return;
-    const numero = '5551999999999'; // ← troca pelo número da Lu com DDD e DDI
+    const numero = '5551980272657'; // 
     const lista = sacola.map(p => `• ${p.nome} - ${p.marca}`).join('\n');
     const mensagem = `Olá Lu! 🌸 Tenho interesse nesses produtos:\n\n${lista}\n\nPoderia me passar mais informações?`;
     const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
