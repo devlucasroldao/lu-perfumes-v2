@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import Link from 'next/link';
 
 export default function ProdutoCard({ produto, onAddSacola }) {
   const [favorito, setFavorito] = useState(false);
@@ -24,7 +25,9 @@ export default function ProdutoCard({ produto, onAddSacola }) {
     setFavorito(!!data);
   };
 
-  const toggleFavorito = async () => {
+  const toggleFavorito = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!usuario) return;
     if (favorito) {
       await supabase.from('favoritos').delete()
@@ -37,14 +40,16 @@ export default function ProdutoCard({ produto, onAddSacola }) {
     }
   };
 
-  const handleAdd = () => {
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     onAddSacola(produto);
     setAdicionado(true);
     setTimeout(() => setAdicionado(false), 1500);
   };
 
   return (
-    <div style={styles.card}>
+    <Link href={`/produto/${produto.id}`} style={styles.card}>
       <div style={styles.imagemWrapper}>
         <img
           src={produto.foto || 'https://placehold.co/400x300?text=Sem+foto'}
@@ -52,7 +57,7 @@ export default function ProdutoCard({ produto, onAddSacola }) {
           style={styles.imagem}
         />
         <button
-          style={{ ...styles.favorito, color: favorito ? 'var(--rosa)' : '#ccc', background: '#fff' }}
+          style={{ ...styles.favorito, color: favorito ? 'var(--rosa)' : '#ccc' }}
           onClick={toggleFavorito}
           title={usuario ? 'Favoritar' : 'Faça login para favoritar'}
         >
@@ -70,15 +75,15 @@ export default function ProdutoCard({ produto, onAddSacola }) {
           {adicionado ? '✓ Adicionado!' : '+ Adicionar à Sacola'}
         </button>
       </div>
-    </div>
+    </Link>
   );
 }
 
 const styles = {
-  card: { background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column' },
+  card: { background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'transform 0.2s' },
   imagemWrapper: { position: 'relative' },
   imagem: { width: '100%', height: 220, objectFit: 'cover' },
-  favorito: { position: 'absolute', top: 10, right: 10, border: 'none', borderRadius: '50%', width: 32, height: 32, fontSize: 18, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' },
+  favorito: { position: 'absolute', top: 10, right: 10, background: '#fff', border: 'none', borderRadius: '50%', width: 32, height: 32, fontSize: 18, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' },
   info: { padding: 16, display: 'flex', flexDirection: 'column', gap: 6, flex: 1 },
   marca: { fontSize: 11, fontWeight: 600, color: 'var(--verde)', textTransform: 'uppercase', letterSpacing: 1 },
   nome: { fontSize: 15, fontWeight: 600, color: 'var(--texto)' },
