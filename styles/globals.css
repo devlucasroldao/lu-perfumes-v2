@@ -20,3 +20,78 @@ body {
 
 a { text-decoration: none; color: inherit; }
 button { cursor: pointer; border: none; outline: none; }
+
+/* ─── RESPONSIVO ─── */
+
+/* Navbar mobile */
+@media (max-width: 768px) {
+  .nav-links { display: none !important; }
+  .nav-logo { font-size: 15px !important; }
+  .nav-container { padding: 0 16px !important; }
+}
+
+/* Catálogo mobile */
+@media (max-width: 768px) {
+  .catalogo-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .catalogo-sidebar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .catalogo-topo {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .catalogo-busca {
+    width: 100% !important;
+  }
+}
+
+/* Grid de produtos mobile */
+@media (max-width: 768px) {
+  .produtos-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .produtos-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Admin mobile */
+@media (max-width: 768px) {
+  .admin-grid2 {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-grid2 > * {
+    grid-column: 1 !important;
+  }
+  .admin-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* Banner mobile */
+@media (max-width: 768px) {
+  .banner-titulo {
+    font-size: 28px !important;
+  }
+  .banner-botoes {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+}
+
+/* Sacola mobile */
+@media (max-width: 768px) {
+  .sacola-item {
+    flex-wrap: wrap !important;
+  }
+}
