@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function AdminGuard({ children }) {
   const [liberado, setLiberado] = useState(false);
@@ -51,7 +52,7 @@ export default function AdminGuard({ children }) {
             Entrar no painel
           </button>
 
-          <a href="/" style={styles.voltar}>← Voltar para o site</a>
+          <Link href="/" style={styles.voltar}>← Voltar para o site</Link>
         </div>
       </div>
     );

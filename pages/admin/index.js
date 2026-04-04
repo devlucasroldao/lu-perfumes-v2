@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import UploadFoto from '../../components/UploadFoto';
 import AdminGuard from '../../components/AdminGuard';
+import Link from 'next/link';
 
 const produtoVazio = { nome: '', marca: '', descricao: '', linha: 'feminino', tipo: 'floral', foto: '', destaque: false, ativo: true };
 const kitVazio = { nome: '', descricao: '', ocasiao: '', foto: '', ativo: true };
@@ -120,7 +121,7 @@ export default function Admin() {
       <div style={styles.page}>
         <header style={styles.header}>
           <h1 style={styles.titulo}>🌸 Painel Admin — Lu Perfumes</h1>
-          <a href="/" style={styles.voltar}>← Ver site</a>
+          <Link href="/" style={styles.voltar}>← Ver site</Link>
         </header>
 
         <div style={styles.abas}>
