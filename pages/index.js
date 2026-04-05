@@ -93,30 +93,52 @@ export default function Home() {
 
       <Navbar sacolaCount={sacola.length} />
 
+      {/* Banner */}
       <section style={styles.banner}>
         <div style={styles.bannerContent}>
-          <p style={styles.bannerSub}>✨ Encontre o presente perfeito</p>
-          <h1 style={styles.bannerTitulo}>Lu Perfumes & Presentes</h1>
-          <p style={styles.bannerDesc}>Perfumes, cosméticos e kits especiais para toda ocasião</p>
-          <div style={styles.bannerBotoes}>
-            <Link href="/catalogo" style={styles.btnPrimario}>Ver Catálogo completo</Link>
-            <Link href="/kits" style={styles.btnSecundario}>Montar Kit 🎁</Link>
+          <p style={styles.bannerSub} className="animate-fade delay-1">✨ Encontre o presente perfeito</p>
+          <h1 style={styles.bannerTitulo} className="animate-fade delay-2">Lu Perfumes & Presentes</h1>
+          <p style={styles.bannerDesc} className="animate-fade delay-3">Perfumes, cosméticos e kits especiais para toda ocasião</p>
+          <div style={styles.bannerBotoes} className="animate-fade delay-4">
+            <Link href="/catalogo" style={styles.btnPrimario} className="btn-hover">Ver Catálogo completo</Link>
+            <Link href="/kits" style={styles.btnSecundario} className="btn-hover">Montar Kit 🎁</Link>
           </div>
         </div>
       </section>
 
+      {/* Chips de filtro rápido */}
       <section style={styles.filtrosSection}>
         <div style={styles.filtrosWrapper}>
           <div style={styles.filtrosScroll}>
             {filtrosRapidos.map(f => (
-              <button key={f.label} style={{ ...styles.chip, background: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? 'var(--verde)' : '#fff', color: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '#fff' : 'var(--texto)', border: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '2px solid var(--verde)' : '2px solid #eee' }} onClick={() => aplicarFiltro(f)}>
+              <button
+                key={f.label}
+                style={{
+                  ...styles.chip,
+                  background: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? 'var(--verde)' : '#fff',
+                  color: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '#fff' : 'var(--texto)',
+                  border: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '2px solid var(--verde)' : '2px solid #eee',
+                }}
+                className="btn-hover"
+                onClick={() => aplicarFiltro(f)}
+              >
                 {f.label}
               </button>
             ))}
           </div>
           <div style={styles.filtrosScroll}>
             {marcas.map(m => (
-              <button key={m} style={{ ...styles.chip, background: marcaAtiva === m ? 'var(--rosa)' : '#fff', color: marcaAtiva === m ? '#fff' : 'var(--texto)', border: marcaAtiva === m ? '2px solid var(--rosa)' : '2px solid #eee' }} onClick={() => setMarcaAtiva(marcaAtiva === m ? null : m)}>
+              <button
+                key={m}
+                style={{
+                  ...styles.chip,
+                  background: marcaAtiva === m ? 'var(--rosa)' : '#fff',
+                  color: marcaAtiva === m ? '#fff' : 'var(--texto)',
+                  border: marcaAtiva === m ? '2px solid var(--rosa)' : '2px solid #eee',
+                }}
+                className="btn-hover"
+                onClick={() => setMarcaAtiva(marcaAtiva === m ? null : m)}
+              >
                 {m}
               </button>
             ))}
@@ -124,20 +146,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Destaques */}
       {!temFiltroAtivo && destaques.length > 0 && (
         <section style={styles.section}>
-          <div style={styles.sectionHeader}>
+          <div style={styles.sectionHeader} className="animate-fade">
             <h2 style={styles.sectionTitulo}>Destaques da semana ⭐</h2>
-            <Link href="/catalogo" style={styles.verTodos}>Ver todos →</Link>
+            <Link href="/catalogo" style={styles.verTodos} className="link-hover">Ver todos →</Link>
           </div>
           <div style={styles.grid}>
-            {destaques.map(p => <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />)}
+            {destaques.map((p, i) => (
+              <div key={p.id} className={`animate-fade delay-${Math.min(i + 1, 5)}`}>
+                <ProdutoCard produto={p} onAddSacola={addSacola} />
+              </div>
+            ))}
           </div>
         </section>
       )}
 
+      {/* Produtos filtrados */}
       <section style={styles.section}>
-        <div style={styles.sectionHeader}>
+        <div style={styles.sectionHeader} className="animate-fade">
           <h2 style={styles.sectionTitulo}>
             {temFiltroAtivo ? `${produtosFiltrados.length} produto(s) encontrado(s)` : 'Todos os produtos 🌸'}
           </h2>
@@ -148,28 +176,46 @@ export default function Home() {
           )}
         </div>
         {carregando ? (
-          <p style={{ color: '#aaa' }}>Carregando produtos... 🌸</p>
+          <div style={styles.grid}>
+            {[1,2,3,4].map(i => (
+              <div key={i} style={{ borderRadius: 16, overflow: 'hidden' }}>
+                <div className="skeleton" style={{ height: 240 }} />
+                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div className="skeleton" style={{ height: 12, width: '60%' }} />
+                  <div className="skeleton" style={{ height: 16, width: '80%' }} />
+                  <div className="skeleton" style={{ height: 12, width: '90%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : produtosFiltrados.length === 0 ? (
-          <div style={styles.vazio}>
+          <div style={styles.vazio} className="animate-scale">
             <p style={styles.vazioTexto}>Nenhum produto encontrado 😕</p>
-            <button style={styles.limparFiltros} onClick={() => { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }}>Limpar filtros</button>
+            <button style={styles.limparFiltros} onClick={() => { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }}>
+              Limpar filtros
+            </button>
           </div>
         ) : (
           <div style={styles.grid}>
-            {produtosFiltrados.map(p => <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />)}
+            {produtosFiltrados.map((p, i) => (
+              <div key={p.id} className={`animate-fade delay-${Math.min(i + 1, 5)}`}>
+                <ProdutoCard produto={p} onAddSacola={addSacola} />
+              </div>
+            ))}
           </div>
         )}
       </section>
 
+      {/* Banner kits */}
       {!temFiltroAtivo && (
-        <section style={styles.bannerKits}>
+        <section style={styles.bannerKits} className="animate-fade">
           <div style={styles.bannerKitsContent}>
             <span style={styles.bannerKitsEmoji}>🎁</span>
             <div>
               <h2 style={styles.bannerKitsTitulo}>Precisa de um presente especial?</h2>
               <p style={styles.bannerKitsTexto}>A Lu monta kits personalizados pra qualquer ocasião!</p>
             </div>
-            <Link href="/kits" style={styles.bannerKitsBtn}>Ver Kits</Link>
+            <Link href="/kits" style={styles.bannerKitsBtn} className="btn-hover">Ver Kits</Link>
           </div>
         </section>
       )}
