@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import ProdutoCard from '../components/ProdutoCard';
 import { supabase } from '../lib/supabase';
+import Head from 'next/head';
 
 const linhas = ['Todos', 'feminino', 'masculino', 'kids', 'baby'];
 const marcas = ['Todos', 'O Boticário', 'Natura', 'Eudora', 'Avon', 'Mary Kay'];
@@ -33,10 +34,7 @@ export default function Catalogo() {
 
   const buscarProdutos = async () => {
     setCarregando(true);
-    const { data } = await supabase
-      .from('produtos')
-      .select('*')
-      .eq('ativo', true);
+    const { data } = await supabase.from('produtos').select('*').eq('ativo', true);
     if (data) setProdutos(data);
     setCarregando(false);
   };
@@ -53,8 +51,7 @@ export default function Catalogo() {
     const matchLinha = filtroLinha === 'Todos' || p.linha === filtroLinha;
     const matchMarca = filtroMarca === 'Todos' || p.marca === filtroMarca;
     const matchTipo = filtroTipo === 'Todos' || p.tipo === filtroTipo;
-    const matchBusca = p.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      p.marca.toLowerCase().includes(busca.toLowerCase());
+    const matchBusca = p.nome.toLowerCase().includes(busca.toLowerCase()) || p.marca.toLowerCase().includes(busca.toLowerCase());
     return matchLinha && matchMarca && matchTipo && matchBusca;
   });
 
@@ -67,16 +64,16 @@ export default function Catalogo() {
 
   return (
     <div>
+      <Head>
+        <title>Catálogo — Lu Perfumes & Presentes</title>
+        <meta name="description" content="Explore nosso catálogo completo de perfumes e cosméticos. Filtre por linha, marca e tipo." />
+      </Head>
+
       <Navbar sacolaCount={sacola.length} />
       <main style={styles.main}>
         <div style={styles.topo}>
           <h1 style={styles.titulo}>Catálogo 🌸</h1>
-          <input
-            style={styles.busca}
-            placeholder="🔍 Buscar produto ou marca..."
-            value={busca}
-            onChange={e => setBusca(e.target.value)}
-          />
+          <input style={styles.busca} placeholder="🔍 Buscar produto ou marca..." value={busca} onChange={e => setBusca(e.target.value)} />
         </div>
 
         <div style={styles.layout}>
@@ -89,11 +86,7 @@ export default function Catalogo() {
               <div key={grupo.titulo} style={styles.filtroGrupo}>
                 <h3 style={styles.filtroTitulo}>{grupo.titulo}</h3>
                 {grupo.opcoes.map(op => (
-                  <button
-                    key={op}
-                    style={{ ...styles.filtroBtn, background: grupo.filtro === op ? 'var(--verde)' : 'transparent', color: grupo.filtro === op ? '#fff' : 'var(--texto)' }}
-                    onClick={() => grupo.setFiltro(op)}
-                  >
+                  <button key={op} style={{ ...styles.filtroBtn, background: grupo.filtro === op ? 'var(--verde)' : 'transparent', color: grupo.filtro === op ? '#fff' : 'var(--texto)' }} onClick={() => grupo.setFiltro(op)}>
                     {op.charAt(0).toUpperCase() + op.slice(1)}
                   </button>
                 ))}
@@ -115,9 +108,7 @@ export default function Catalogo() {
               </div>
             ) : (
               <div style={styles.grid}>
-                {produtosFiltrados.map(p => (
-                  <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />
-                ))}
+                {produtosFiltrados.map(p => <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />)}
               </div>
             )}
           </div>

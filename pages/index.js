@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import ProdutoCard from '../components/ProdutoCard';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
+import Head from 'next/head';
 
 const filtrosRapidos = [
   { label: '✨ Todos', value: null, tipo: null },
@@ -47,43 +48,26 @@ export default function Home() {
       .eq('destaque', true)
       .eq('ativo', true)
       .limit(4);
-
     const { data: produtosData } = await supabase
       .from('produtos')
       .select('*')
       .eq('ativo', true);
-
     if (destaquesData) setDestaques(destaquesData);
-    if (produtosData) {
-      setTodosProdutos(produtosData);
-      setProdutosFiltrados(produtosData);
-    }
+    if (produtosData) { setTodosProdutos(produtosData); setProdutosFiltrados(produtosData); }
     setCarregando(false);
   };
 
   const filtrar = () => {
     let resultado = [...todosProdutos];
-    if (filtroAtivo && filtroTipoAtivo === 'linha') {
-      resultado = resultado.filter(p => p.linha === filtroAtivo);
-    }
-    if (filtroAtivo && filtroTipoAtivo === 'tipo') {
-      resultado = resultado.filter(p => p.tipo === filtroAtivo);
-    }
-    if (marcaAtiva) {
-      resultado = resultado.filter(p => p.marca === marcaAtiva);
-    }
+    if (filtroAtivo && filtroTipoAtivo === 'linha') resultado = resultado.filter(p => p.linha === filtroAtivo);
+    if (filtroAtivo && filtroTipoAtivo === 'tipo') resultado = resultado.filter(p => p.tipo === filtroAtivo);
+    if (marcaAtiva) resultado = resultado.filter(p => p.marca === marcaAtiva);
     setProdutosFiltrados(resultado);
   };
 
   const aplicarFiltro = (filtro) => {
-    if (filtro.value === null) {
-      setFiltroAtivo(null);
-      setFiltroTipoAtivo(null);
-      setMarcaAtiva(null);
-    } else {
-      setFiltroAtivo(filtro.value);
-      setFiltroTipoAtivo(filtro.tipo);
-    }
+    if (filtro.value === null) { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }
+    else { setFiltroAtivo(filtro.value); setFiltroTipoAtivo(filtro.tipo); }
   };
 
   const addSacola = (produto) => {
@@ -98,9 +82,17 @@ export default function Home() {
 
   return (
     <div style={styles.page}>
+      <Head>
+        <title>Lu Perfumes & Presentes — Arroio do Sal</title>
+        <meta name="description" content="Perfumes, cosméticos e kits especiais para toda ocasião. Atendimento personalizado com carinho em Arroio do Sal - RS." />
+        <meta name="keywords" content="perfumes, cosméticos, kits presente, Arroio do Sal, O Boticário, Natura, Eudora, Avon, Mary Kay" />
+        <meta property="og:title" content="Lu Perfumes & Presentes" />
+        <meta property="og:description" content="Perfumes, cosméticos e kits especiais para toda ocasião." />
+        <meta property="og:type" content="website" />
+      </Head>
+
       <Navbar sacolaCount={sacola.length} />
 
-      {/* Banner */}
       <section style={styles.banner}>
         <div style={styles.bannerContent}>
           <p style={styles.bannerSub}>✨ Encontre o presente perfeito</p>
@@ -113,39 +105,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Chips de filtro rápido */}
       <section style={styles.filtrosSection}>
         <div style={styles.filtrosWrapper}>
           <div style={styles.filtrosScroll}>
             {filtrosRapidos.map(f => (
-              <button
-                key={f.label}
-                style={{
-                  ...styles.chip,
-                  background: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? 'var(--verde)' : '#fff',
-                  color: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '#fff' : 'var(--texto)',
-                  border: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '2px solid var(--verde)' : '2px solid #eee',
-                }}
-                onClick={() => aplicarFiltro(f)}
-              >
+              <button key={f.label} style={{ ...styles.chip, background: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? 'var(--verde)' : '#fff', color: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '#fff' : 'var(--texto)', border: filtroAtivo === f.value && filtroTipoAtivo === f.tipo ? '2px solid var(--verde)' : '2px solid #eee' }} onClick={() => aplicarFiltro(f)}>
                 {f.label}
               </button>
             ))}
           </div>
-
-          {/* Filtro por marca */}
           <div style={styles.filtrosScroll}>
             {marcas.map(m => (
-              <button
-                key={m}
-                style={{
-                  ...styles.chip,
-                  background: marcaAtiva === m ? 'var(--rosa)' : '#fff',
-                  color: marcaAtiva === m ? '#fff' : 'var(--texto)',
-                  border: marcaAtiva === m ? '2px solid var(--rosa)' : '2px solid #eee',
-                }}
-                onClick={() => setMarcaAtiva(marcaAtiva === m ? null : m)}
-              >
+              <button key={m} style={{ ...styles.chip, background: marcaAtiva === m ? 'var(--rosa)' : '#fff', color: marcaAtiva === m ? '#fff' : 'var(--texto)', border: marcaAtiva === m ? '2px solid var(--rosa)' : '2px solid #eee' }} onClick={() => setMarcaAtiva(marcaAtiva === m ? null : m)}>
                 {m}
               </button>
             ))}
@@ -153,7 +124,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Destaques — só mostra quando não tem filtro */}
       {!temFiltroAtivo && destaques.length > 0 && (
         <section style={styles.section}>
           <div style={styles.sectionHeader}>
@@ -161,48 +131,36 @@ export default function Home() {
             <Link href="/catalogo" style={styles.verTodos}>Ver todos →</Link>
           </div>
           <div style={styles.grid}>
-            {destaques.map(p => (
-              <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />
-            ))}
+            {destaques.map(p => <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />)}
           </div>
         </section>
       )}
 
-      {/* Produtos filtrados */}
       <section style={styles.section}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitulo}>
             {temFiltroAtivo ? `${produtosFiltrados.length} produto(s) encontrado(s)` : 'Todos os produtos 🌸'}
           </h2>
           {temFiltroAtivo && (
-            <button
-              style={styles.limparFiltros}
-              onClick={() => { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }}
-            >
+            <button style={styles.limparFiltros} onClick={() => { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }}>
               ✕ Limpar filtros
             </button>
           )}
         </div>
-
         {carregando ? (
           <p style={{ color: '#aaa' }}>Carregando produtos... 🌸</p>
         ) : produtosFiltrados.length === 0 ? (
           <div style={styles.vazio}>
             <p style={styles.vazioTexto}>Nenhum produto encontrado 😕</p>
-            <button style={styles.limparFiltros} onClick={() => { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }}>
-              Limpar filtros
-            </button>
+            <button style={styles.limparFiltros} onClick={() => { setFiltroAtivo(null); setFiltroTipoAtivo(null); setMarcaAtiva(null); }}>Limpar filtros</button>
           </div>
         ) : (
           <div style={styles.grid}>
-            {produtosFiltrados.map(p => (
-              <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />
-            ))}
+            {produtosFiltrados.map(p => <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />)}
           </div>
         )}
       </section>
 
-      {/* Banner kits */}
       {!temFiltroAtivo && (
         <section style={styles.bannerKits}>
           <div style={styles.bannerKitsContent}>
