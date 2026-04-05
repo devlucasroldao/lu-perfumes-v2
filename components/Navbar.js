@@ -43,8 +43,12 @@ export default function Navbar({ sacolaCount = 0 }) {
       <nav style={styles.nav} onClick={e => e.stopPropagation()}>
         <div style={styles.container} className="nav-container">
 
-          <Link href="/" style={styles.logo} className="nav-logo">
-            🌸 Lu Perfumes & Presentes
+          <Link href="/" style={styles.logoWrapper} className="nav-logo">
+            <img
+              src="/logo.png"
+              alt="Lu Perfumes & Presentes"
+              style={styles.logoImg}
+            />
           </Link>
 
           {/* Links desktop */}
@@ -53,7 +57,7 @@ export default function Navbar({ sacolaCount = 0 }) {
               <span style={styles.link} onClick={() => { setLinhaOpen(!linhaOpen); setMarcaOpen(false); setTipoOpen(false); setUsuarioOpen(false); }}>Por Linha ▾</span>
               {linhaOpen && (
                 <div style={styles.dropMenu}>
-                  {['feminino','masculino','kids','baby'].map(l => (
+                  {['feminino', 'masculino', 'kids', 'baby'].map(l => (
                     <Link key={l} href={`/catalogo?linha=${l}`} style={styles.dropItem} onClick={() => setLinhaOpen(false)}>
                       {l.charAt(0).toUpperCase() + l.slice(1)}
                     </Link>
@@ -65,7 +69,7 @@ export default function Navbar({ sacolaCount = 0 }) {
               <span style={styles.link} onClick={() => { setMarcaOpen(!marcaOpen); setLinhaOpen(false); setTipoOpen(false); setUsuarioOpen(false); }}>Por Marca ▾</span>
               {marcaOpen && (
                 <div style={styles.dropMenu}>
-                  {['O Boticário','Natura','Eudora','Avon','Mary Kay'].map(m => (
+                  {['O Boticário', 'Natura', 'Eudora', 'Avon', 'Mary Kay'].map(m => (
                     <Link key={m} href={`/catalogo?marca=${m}`} style={styles.dropItem} onClick={() => setMarcaOpen(false)}>{m}</Link>
                   ))}
                 </div>
@@ -75,7 +79,7 @@ export default function Navbar({ sacolaCount = 0 }) {
               <span style={styles.link} onClick={() => { setTipoOpen(!tipoOpen); setLinhaOpen(false); setMarcaOpen(false); setUsuarioOpen(false); }}>Por Tipo ▾</span>
               {tipoOpen && (
                 <div style={styles.dropMenu}>
-                  {['Floral','Amadeirado','Cítrico','Doce','Frutal'].map(t => (
+                  {['Floral', 'Amadeirado', 'Cítrico', 'Doce', 'Frutal'].map(t => (
                     <Link key={t} href={`/catalogo?tipo=${t.toLowerCase()}`} style={styles.dropItem} onClick={() => setTipoOpen(false)}>{t}</Link>
                   ))}
                 </div>
@@ -168,7 +172,8 @@ export default function Navbar({ sacolaCount = 0 }) {
 const styles = {
   nav: { background: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', position: 'sticky', top: 0, zIndex: 100 },
   container: { maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
-  logo: { fontWeight: 700, fontSize: 18, color: 'var(--verde)', flexShrink: 0 },
+  logoWrapper: { display: 'flex', alignItems: 'center', flexShrink: 0 },
+  logoImg: { height: 40, width: 'auto', objectFit: 'contain' },
   links: { display: 'flex', gap: 24, alignItems: 'center', flexShrink: 0 },
   link: { fontSize: 14, fontWeight: 500, color: 'var(--texto)', cursor: 'pointer', whiteSpace: 'nowrap' },
   dropdown: { position: 'relative' },
