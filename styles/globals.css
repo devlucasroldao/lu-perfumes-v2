@@ -95,5 +95,3 @@ button { cursor: pointer; border: none; outline: none; }
     flex-wrap: wrap !important;
   }
 }
-
-buscaWrapper: { flex: 1, maxWidth: 360, margin: '0 24px' },
