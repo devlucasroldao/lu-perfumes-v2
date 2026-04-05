@@ -17,7 +17,7 @@ export default function Sobre() {
 
                 <section style={styles.hero}>
                     <div style={styles.heroContent}>
-                        <img src="/lu-foto.png" alt="Lu" style={styles.fotoLu} />
+                        <img src="/lu-foto.jpg" alt="Lu" style={styles.fotoLu} />
                         <div style={styles.heroTexto}>
                             <span style={styles.tag}>Sobre a Lu</span>
                             <h1 style={styles.titulo}>Olá, eu sou a Lu!</h1>
@@ -80,11 +80,6 @@ export default function Sobre() {
                 </section>
 
             </main>
-
-            <footer style={styles.footer}>
-                <p>🌸 Lu Perfumes & Presentes</p>
-                <p style={{ fontSize: 13, marginTop: 4, opacity: 0.7 }}>Feito com carinho 💛</p>
-            </footer>
         </div>
     );
 }

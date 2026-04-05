@@ -79,12 +79,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <p>🌸 Lu Perfumes & Presentes</p>
-        <p style={{ fontSize: 13, marginTop: 4, opacity: 0.7 }}>Feito com carinho 💛</p>
-      </footer>
     </div>
   );
 }
