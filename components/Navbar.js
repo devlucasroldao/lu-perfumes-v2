@@ -45,7 +45,7 @@ export default function Navbar({ sacolaCount = 0 }) {
 
           <Link href="/" style={styles.logoWrapper} className="nav-logo">
             <img
-              src="/public/logo.png"
+              src="/logo.png"
               alt="Lu Perfumes & Presentes"
               style={styles.logoImg}
             />
