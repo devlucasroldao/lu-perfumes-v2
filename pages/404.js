@@ -1,8 +1,12 @@
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default function Pagina404() {
   return (
     <div style={styles.page}>
+      <Head>
+        <title>Página não encontrada — Lu Perfumes & Presentes</title>
+      </Head>
       <div style={styles.content}>
         <p style={styles.emoji}>🌸</p>
         <h1 style={styles.titulo}>Ops! Página não encontrada</h1>

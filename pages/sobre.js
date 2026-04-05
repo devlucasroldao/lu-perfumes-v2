@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Head from 'next/head';
 
 export default function Sobre() {
     const [sacola, setSacola] = useState([]);
@@ -12,6 +13,10 @@ export default function Sobre() {
 
     return (
         <div>
+            <Head>
+                <title>Sobre a Lu — Lu Perfumes & Presentes</title>
+                <meta name="description" content="Conheça a Lu, revendedora apaixonada por perfumes e cosméticos em Arroio do Sal - RS." />
+            </Head>
             <Navbar sacolaCount={sacola.length} />
             <main style={styles.main}>
 

@@ -3,18 +3,17 @@ import Navbar from '../components/Navbar';
 import ProdutoCard from '../components/ProdutoCard';
 import { supabase } from '../lib/supabase';
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default function Favoritos() {
   const [sacola, setSacola] = useState([]);
   const [favoritos, setFavoritos] = useState([]);
   const [usuario, setUsuario] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  const [modalAberto, setModalAberto] = useState(false);
 
   useEffect(() => {
     const salva = localStorage.getItem('sacola');
     if (salva) setSacola(JSON.parse(salva));
-
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user || null;
       setUsuario(user);
@@ -25,10 +24,7 @@ export default function Favoritos() {
 
   const buscarFavoritos = async (userId) => {
     setCarregando(true);
-    const { data } = await supabase
-      .from('favoritos')
-      .select('*, produtos(*)')
-      .eq('user_id', userId);
+    const { data } = await supabase.from('favoritos').select('*, produtos(*)').eq('user_id', userId);
     if (data) setFavoritos(data.map(f => f.produtos).filter(Boolean));
     setCarregando(false);
   };
@@ -51,11 +47,14 @@ export default function Favoritos() {
 
   return (
     <div style={styles.page}>
+      <Head>
+        <title>Meus Favoritos — Lu Perfumes & Presentes</title>
+        <meta name="description" content="Seus produtos favoritos salvos para consultar quando quiser." />
+      </Head>
+
       <Navbar sacolaCount={sacola.length} />
 
       <main style={styles.main}>
-
-        {/* Header */}
         <div style={styles.header}>
           <div>
             <h1 style={styles.titulo}>Meus Favoritos ♡</h1>
@@ -64,30 +63,21 @@ export default function Favoritos() {
             </p>
           </div>
           {usuario && favoritos.length > 0 && (
-            <button style={styles.btnAddTodos} onClick={adicionarTudoNaSacola}>
-              🛍️ Adicionar tudo na sacola
-            </button>
+            <button style={styles.btnAddTodos} onClick={adicionarTudoNaSacola}>🛍️ Adicionar tudo na sacola</button>
           )}
         </div>
 
-        {/* Não logado */}
         {!usuario && (
           <div style={styles.estado}>
             <div style={styles.estadoIcone}>🔐</div>
             <h2 style={styles.estadoTitulo}>Entre na sua conta</h2>
             <p style={styles.estadoTexto}>Faça login para salvar seus produtos favoritos e acessá-los de qualquer lugar!</p>
             <div style={styles.estadoBotoes}>
-              <button style={styles.btnEntrar} onClick={() => setModalAberto(true)}>
-                Entrar agora
-              </button>
-              <Link href="/catalogo" style={styles.btnCatalogo}>
-                Ver Catálogo 🌸
-              </Link>
+              <Link href="/catalogo" style={styles.btnEntrar}>Ver Catálogo 🌸</Link>
             </div>
           </div>
         )}
 
-        {/* Carregando */}
         {usuario && carregando && (
           <div style={styles.estado}>
             <div style={styles.estadoIcone}>🌸</div>
@@ -95,7 +85,6 @@ export default function Favoritos() {
           </div>
         )}
 
-        {/* Sem favoritos */}
         {usuario && !carregando && favoritos.length === 0 && (
           <div style={styles.estado}>
             <div style={styles.estadoIcone}>♡</div>
@@ -108,16 +97,11 @@ export default function Favoritos() {
           </div>
         )}
 
-        {/* Grid de favoritos */}
         {usuario && !carregando && favoritos.length > 0 && (
           <>
             <div style={styles.grid}>
-              {favoritos.map(p => (
-                <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />
-              ))}
+              {favoritos.map(p => <ProdutoCard key={p.id} produto={p} onAddSacola={addSacola} />)}
             </div>
-
-            {/* Banner sugestão */}
             <div style={styles.banner}>
               <span style={styles.bannerEmoji}>🎁</span>
               <div style={styles.bannerTexto}>
@@ -125,12 +109,8 @@ export default function Favoritos() {
                 <p style={styles.bannerDesc}>Adicione tudo na sacola e mande a lista pro WhatsApp da Lu de uma vez!</p>
               </div>
               <div style={styles.bannerBotoes}>
-                <button style={styles.btnAddTodosBanner} onClick={adicionarTudoNaSacola}>
-                  🛍️ Adicionar tudo
-                </button>
-                <Link href="/sacola" style={styles.btnVerSacola}>
-                  Ver sacola →
-                </Link>
+                <button style={styles.btnAddTodosBanner} onClick={adicionarTudoNaSacola}>🛍️ Adicionar tudo</button>
+                <Link href="/sacola" style={styles.btnVerSacola}>Ver sacola →</Link>
               </div>
             </div>
           </>
@@ -152,7 +132,7 @@ const styles = {
   estadoTitulo: { fontSize: 24, fontWeight: 700, color: 'var(--texto)', marginBottom: 8 },
   estadoTexto: { fontSize: 15, color: '#888', lineHeight: 1.6, marginBottom: 32 },
   estadoBotoes: { display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' },
-  btnEntrar: { background: 'var(--rosa)', color: '#fff', padding: '14px 28px', borderRadius: 50, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' },
+  btnEntrar: { background: 'var(--rosa)', color: '#fff', padding: '14px 28px', borderRadius: 50, fontWeight: 700, fontSize: 15 },
   btnCatalogo: { background: 'transparent', color: 'var(--verde)', padding: '14px 28px', borderRadius: 50, fontWeight: 700, fontSize: 15, border: '2px solid var(--verde)' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 24, marginBottom: 48 },
   banner: { background: '#fff', borderRadius: 20, padding: '28px 32px', display: 'flex', alignItems: 'center', gap: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', flexWrap: 'wrap' },

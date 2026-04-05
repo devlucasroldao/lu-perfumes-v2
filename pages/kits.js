@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { supabase } from '../lib/supabase';
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default function Kits() {
   const [sacola, setSacola] = useState([]);
@@ -57,6 +58,10 @@ export default function Kits() {
 
   return (
     <div style={styles.page}>
+      <Head>
+        <title>Kits para Presentear — Lu Perfumes & Presentes</title>
+        <meta name="description" content="Kits prontos ou personalizados para qualquer ocasião. Monte o presente perfeito com a Lu!" />
+      </Head>
       <Navbar sacolaCount={sacola.length} />
 
       {/* Hero */}

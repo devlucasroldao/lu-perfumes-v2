@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Navbar from '../../components/Navbar';
 import { supabase } from '../../lib/supabase';
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default function DetalhesProduto() {
   const router = useRouter();
@@ -116,6 +117,10 @@ export default function DetalhesProduto() {
 
   return (
     <div>
+      <Head>
+        <title>{produto ? `${produto.nome} — Lu Perfumes & Presentes` : 'Produto — Lu Perfumes & Presentes'}</title>
+        <meta name="description" content={produto?.descricao || 'Veja os detalhes desse produto incrível!'} />
+      </Head>
       <Navbar sacolaCount={sacola.length} />
 
       <main style={styles.main}>
