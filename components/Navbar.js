@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import AuthModal from './AuthModal';
 import Busca from './Busca';
 
+
 export default function Navbar({ sacolaCount = 0 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [linhaOpen, setLinhaOpen] = useState(false);
@@ -86,6 +87,7 @@ export default function Navbar({ sacolaCount = 0 }) {
               )}
             </div>
             <Link href="/kits" style={styles.link}>Kits 🎁</Link>
+            <Link href="/sobre" style={styles.link}>Sobre 🌸</Link>
           </div>
 
           {/* Busca desktop */}
@@ -140,6 +142,7 @@ export default function Navbar({ sacolaCount = 0 }) {
             <Link href="/catalogo?linha=kids" style={styles.menuItem} onClick={() => setMenuOpen(false)}>👧 Kids</Link>
             <Link href="/catalogo?linha=baby" style={styles.menuItem} onClick={() => setMenuOpen(false)}>👶 Baby</Link>
             <Link href="/kits" style={styles.menuItem} onClick={() => setMenuOpen(false)}>🎁 Kits</Link>
+            <Link href="/sobre" style={styles.menuItem} onClick={() => setMenuOpen(false)}>🌸 Sobre a Lu</Link>
             <Link href="/favoritos" style={styles.menuItem} onClick={() => setMenuOpen(false)}>♡ Favoritos</Link>
             <div style={styles.menuDivisor} />
             {usuario ? (
