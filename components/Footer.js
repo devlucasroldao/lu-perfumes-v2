@@ -36,7 +36,7 @@ export default function Footer() {
             <Link href="/" style={styles.link}>🏠 Home</Link>
             <Link href="/catalogo" style={styles.link}>🌸 Catálogo</Link>
             <Link href="/kits" style={styles.link}>🎁 Kits</Link>
-            <Link href="/favoritos" style={styles.link}>♡ Favoritos</Link>
+            <Link href="/favoritos" style={styles.link}>🩷 Favoritos</Link>
             <Link href="/sacola" style={styles.link}>🛍️ Sacola</Link>
             <Link href="/sobre" style={styles.link}>💛 Sobre a Lu</Link>
           </div>

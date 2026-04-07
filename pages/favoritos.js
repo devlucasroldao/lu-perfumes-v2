@@ -57,7 +57,7 @@ export default function Favoritos() {
       <main style={styles.main}>
         <div style={styles.header}>
           <div>
-            <h1 style={styles.titulo}>Meus Favoritos ♡</h1>
+            <h1 style={styles.titulo}>Meus Favoritos 🩷</h1>
             <p style={styles.subtitulo}>
               {!usuario ? 'Faça login para ver seus favoritos' : carregando ? 'Carregando...' : `${favoritos.length} ${favoritos.length === 1 ? 'produto favoritado' : 'produtos favoritados'}`}
             </p>
@@ -87,7 +87,7 @@ export default function Favoritos() {
 
         {usuario && !carregando && favoritos.length === 0 && (
           <div style={styles.estado}>
-            <div style={styles.estadoIcone}>♡</div>
+            <div style={styles.estadoIcone}>🩷</div>
             <h2 style={styles.estadoTitulo}>Nenhum favorito ainda</h2>
             <p style={styles.estadoTexto}>Explore o catálogo e clique no coração dos produtos que você ama para salvá-los aqui!</p>
             <div style={styles.estadoBotoes}>

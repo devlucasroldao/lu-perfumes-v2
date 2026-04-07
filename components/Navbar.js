@@ -105,7 +105,7 @@ export default function Navbar({ sacolaCount = 0 }) {
                   </span>
                   {usuarioOpen && (
                     <div style={{ ...styles.dropMenu, right: 0, left: 'auto' }}>
-                      <Link href="/favoritos" style={styles.dropItem} onClick={() => setUsuarioOpen(false)}>♡ Favoritos</Link>
+                      <Link href="/favoritos" style={styles.dropItem} onClick={() => setUsuarioOpen(false)}>🩷 Favoritos</Link>
                       <span style={{ ...styles.dropItem, color: 'var(--rosa)', cursor: 'pointer' }} onClick={() => { sair(); setUsuarioOpen(false); }}>Sair</span>
                     </div>
                   )}
