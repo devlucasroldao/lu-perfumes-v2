@@ -8,29 +8,41 @@ export default function Kits() {
   const [sacola, setSacola] = useState([]);
   const [kits, setKits] = useState([]);
   const [produtos, setProdutos] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
   const [kitPersonalizado, setKitPersonalizado] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [aba, setAba] = useState('prontos');
+  const [usuario, setUsuario] = useState(null);
+  const [busca, setBusca] = useState('');
+  const [filtroKits, setFiltroKits] = useState('todos'); // 'todos' | 'favoritos'
 
   useEffect(() => {
     const salva = localStorage.getItem('sacola');
     if (salva) setSacola(JSON.parse(salva));
     buscarDados();
+    supabase.auth.getSession().then(({ data }) => {
+      const user = data.session?.user || null;
+      setUsuario(user);
+      if (user) buscarFavoritos(user.id);
+    });
   }, []);
 
   const buscarDados = async () => {
     setCarregando(true);
     const { data: kitsData } = await supabase
-      .from('kits')
-      .select('*, kit_produtos(*, produtos(*))')
-      .eq('ativo', true);
+      .from('kits').select('*, kit_produtos(*, produtos(*))').eq('ativo', true);
     const { data: produtosData } = await supabase
-      .from('produtos')
-      .select('*')
-      .eq('ativo', true);
+      .from('produtos').select('*').eq('ativo', true);
     if (kitsData) setKits(kitsData);
     if (produtosData) setProdutos(produtosData);
     setCarregando(false);
+  };
+
+  const buscarFavoritos = async (userId) => {
+    const { data } = await supabase
+      .from('favoritos').select('*, produtos(*)')
+      .eq('user_id', userId);
+    if (data) setFavoritos(data.map(f => f.produtos).filter(Boolean));
   };
 
   const toggleKitPersonalizado = (produto) => {
@@ -56,31 +68,39 @@ export default function Kits() {
     window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
   };
 
+  // Filtra produtos por busca e por favoritos
+  const produtosExibidos = (() => {
+    let lista = filtroKits === 'favoritos' ? favoritos : produtos;
+    if (busca) {
+      lista = lista.filter(p =>
+        p.nome.toLowerCase().includes(busca.toLowerCase()) ||
+        p.marca.toLowerCase().includes(busca.toLowerCase()) ||
+        p.tipo?.toLowerCase().includes(busca.toLowerCase())
+      );
+    }
+    return lista;
+  })();
+
   return (
     <div style={styles.page}>
       <Head>
         <title>Kits para Presentear — Lu Perfumes & Presentes</title>
         <meta name="description" content="Kits prontos ou personalizados para qualquer ocasião. Monte o presente perfeito com a Lu!" />
       </Head>
+
       <Navbar sacolaCount={sacola.length} />
 
       {/* Hero */}
       <section style={styles.hero}>
         <div style={styles.heroContent}>
-          <span style={styles.heroBadge}>🎁 Presentes especiais</span>
-          <h1 style={styles.heroTitulo}>Kits para Presentear</h1>
-          <p style={styles.heroSubtitulo}>Escolha um kit pronto ou monte o seu do jeito que quiser — a Lu cuida do resto!</p>
-          <div style={styles.heroAbas}>
-            <button
-              style={{ ...styles.heroAba, ...(aba === 'prontos' ? styles.heroAbaAtiva : {}) }}
-              onClick={() => setAba('prontos')}
-            >
+          <span style={styles.heroBadge} className="animate-fade delay-1">🎁 Presentes especiais</span>
+          <h1 style={styles.heroTitulo} className="animate-fade delay-2">Kits para Presentear</h1>
+          <p style={styles.heroSubtitulo} className="animate-fade delay-3">Escolha um kit pronto ou monte o seu do jeito que quiser — a Lu cuida do resto!</p>
+          <div style={styles.heroAbas} className="animate-fade delay-4">
+            <button style={{ ...styles.heroAba, ...(aba === 'prontos' ? styles.heroAbaAtiva : {}) }} onClick={() => setAba('prontos')}>
               🎀 Kits Prontos
             </button>
-            <button
-              style={{ ...styles.heroAba, ...(aba === 'personalizado' ? styles.heroAbaAtiva : {}) }}
-              onClick={() => setAba('personalizado')}
-            >
+            <button style={{ ...styles.heroAba, ...(aba === 'personalizado' ? styles.heroAbaAtiva : {}) }} onClick={() => setAba('personalizado')}>
               ✨ Monte o Seu
             </button>
           </div>
@@ -94,29 +114,21 @@ export default function Kits() {
           <>
             {/* Kits Prontos */}
             {aba === 'prontos' && (
-              <div>
+              <div className="animate-fade">
                 {kits.length === 0 ? (
                   <div style={styles.vazio}>
                     <span style={styles.vazioBig}>🎁</span>
                     <h3 style={styles.vazioTitulo}>Kits em breve!</h3>
                     <p style={styles.vazioTexto}>A Lu está preparando kits especiais. Enquanto isso, monte o seu kit personalizado!</p>
-                    <button style={styles.btnMontarKit} onClick={() => setAba('personalizado')}>
-                      ✨ Montar kit personalizado
-                    </button>
+                    <button style={styles.btnMontarKit} onClick={() => setAba('personalizado')}>✨ Montar kit personalizado</button>
                   </div>
                 ) : (
                   <div style={styles.gridKits}>
-                    {kits.map(kit => (
-                      <div key={kit.id} style={styles.cardKit}>
+                    {kits.map((kit, i) => (
+                      <div key={kit.id} style={styles.cardKit} className={`animate-fade delay-${Math.min(i+1,5)} card-hover`}>
                         <div style={styles.kitImagemWrapper}>
-                          <img
-                            src={kit.foto || 'https://placehold.co/600x300?text=Kit+Presente'}
-                            alt={kit.nome}
-                            style={styles.kitFoto}
-                          />
-                          {kit.ocasiao && (
-                            <span style={styles.kitBadge}>{kit.ocasiao}</span>
-                          )}
+                          <img src={kit.foto || 'https://placehold.co/600x300?text=Kit+Presente'} alt={kit.nome} style={styles.kitFoto} />
+                          {kit.ocasiao && <span style={styles.kitBadge}>{kit.ocasiao}</span>}
                         </div>
                         <div style={styles.kitInfo}>
                           <h3 style={styles.kitNome}>{kit.nome}</h3>
@@ -126,14 +138,12 @@ export default function Kits() {
                               <p style={styles.kitItensTitle}>O que inclui:</p>
                               <div style={styles.kitItensList}>
                                 {kit.kit_produtos.map((kp, i) => (
-                                  <span key={i} style={styles.kitItemChip}>
-                                    {kp.produtos?.nome}
-                                  </span>
+                                  <span key={i} style={styles.kitItemChip}>{kp.produtos?.nome}</span>
                                 ))}
                               </div>
                             </div>
                           )}
-                          <button style={styles.btnInteresse} onClick={() => enviarKitPronto(kit)}>
+                          <button style={styles.btnInteresse} onClick={() => enviarKitPronto(kit)} className="btn-hover">
                             📲 Tenho interesse!
                           </button>
                         </div>
@@ -146,7 +156,9 @@ export default function Kits() {
 
             {/* Monte o Seu Kit */}
             {aba === 'personalizado' && (
-              <div style={styles.personalizado}>
+              <div style={styles.personalizado} className="animate-fade">
+
+                {/* Instrução */}
                 <div style={styles.instrucao}>
                   <span style={styles.instrucaoEmoji}>👆</span>
                   <div>
@@ -155,8 +167,9 @@ export default function Kits() {
                   </div>
                 </div>
 
+                {/* Resumo do kit */}
                 {kitPersonalizado.length > 0 && (
-                  <div style={styles.resumoKit}>
+                  <div style={styles.resumoKit} className="animate-slide-down">
                     <div style={styles.resumoHeader}>
                       <h3 style={styles.resumoTitulo}>Seu kit</h3>
                       <span style={styles.resumoCount}>{kitPersonalizado.length} {kitPersonalizado.length === 1 ? 'produto' : 'produtos'}</span>
@@ -172,45 +185,110 @@ export default function Kits() {
                         </div>
                       ))}
                     </div>
-                    <button style={styles.btnEnviar} onClick={enviarKitPersonalizado}>
+                    <button style={styles.btnEnviar} onClick={enviarKitPersonalizado} className="btn-hover">
                       📲 Enviar kit pro WhatsApp da Lu
                     </button>
                   </div>
                 )}
 
-                <div style={styles.gridProdutos}>
-                  {produtos.map(p => {
-                    const selecionado = kitPersonalizado.find(k => k.id === p.id);
-                    return (
-                      <div
-                        key={p.id}
-                        style={{ ...styles.cardProduto, border: selecionado ? '2px solid var(--rosa)' : '2px solid transparent', background: selecionado ? '#fff8f8' : '#fff' }}
-                        onClick={() => toggleKitPersonalizado(p)}
+                {/* Barra de busca e filtros */}
+                <div style={styles.buscaWrapper}>
+                  <div style={styles.buscaInput}>
+                    <span style={styles.buscaIcone}>🔍</span>
+                    <input
+                      style={styles.input}
+                      placeholder="Buscar produto, marca ou tipo..."
+                      value={busca}
+                      onChange={e => setBusca(e.target.value)}
+                    />
+                    {busca && <button style={styles.buscaLimpar} onClick={() => setBusca('')}>✕</button>}
+                  </div>
+
+                  <div style={styles.filtrosBusca}>
+                    <button
+                      style={{ ...styles.filtroBuscaBtn, background: filtroKits === 'todos' ? 'var(--verde)' : '#fff', color: filtroKits === 'todos' ? '#fff' : 'var(--texto)', border: filtroKits === 'todos' ? '2px solid var(--verde)' : '2px solid #eee' }}
+                      onClick={() => setFiltroKits('todos')}
+                      className="btn-hover"
+                    >
+                      🌸 Todos os produtos ({produtos.length})
+                    </button>
+                    {usuario && (
+                      <button
+                        style={{ ...styles.filtroBuscaBtn, background: filtroKits === 'favoritos' ? 'var(--rosa)' : '#fff', color: filtroKits === 'favoritos' ? '#fff' : 'var(--texto)', border: filtroKits === 'favoritos' ? '2px solid var(--rosa)' : '2px solid #eee' }}
+                        onClick={() => setFiltroKits('favoritos')}
+                        className="btn-hover"
                       >
-                        <div style={styles.produtoImagemWrapper}>
-                          <img
-                            src={p.foto || 'https://placehold.co/300x200?text=Sem+foto'}
-                            alt={p.nome}
-                            style={styles.produtoFoto}
-                          />
-                          <div style={{ ...styles.checkCircle, background: selecionado ? 'var(--rosa)' : 'rgba(255,255,255,0.9)', color: selecionado ? '#fff' : '#aaa' }}>
-                            {selecionado ? '✓' : '+'}
+                        ♥ Meus favoritos ({favoritos.length})
+                      </button>
+                    )}
+                    {!usuario && (
+                      <div style={styles.loginDica}>
+                        💡 <Link href="/favoritos" style={{ color: 'var(--verde)', fontWeight: 600 }}>Faça login</Link> para filtrar pelos seus favoritos!
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Resultado da busca */}
+                {busca && (
+                  <p style={styles.resultadoBusca}>
+                    {produtosExibidos.length} produto(s) encontrado(s) para "{busca}"
+                  </p>
+                )}
+
+                {/* Grid de produtos */}
+                {produtosExibidos.length === 0 ? (
+                  <div style={styles.vazio}>
+                    <span style={styles.vazioBig}>😕</span>
+                    <h3 style={styles.vazioTitulo}>
+                      {filtroKits === 'favoritos' ? 'Nenhum favorito ainda' : 'Nenhum produto encontrado'}
+                    </h3>
+                    <p style={styles.vazioTexto}>
+                      {filtroKits === 'favoritos'
+                        ? 'Favorite produtos no catálogo para vê-los aqui!'
+                        : 'Tente outro termo de busca'}
+                    </p>
+                    {filtroKits === 'favoritos' && (
+                      <Link href="/catalogo" style={styles.btnMontarKit}>Ver Catálogo 🌸</Link>
+                    )}
+                  </div>
+                ) : (
+                  <div style={styles.gridProdutos}>
+                    {produtosExibidos.map((p, i) => {
+                      const selecionado = kitPersonalizado.find(k => k.id === p.id);
+                      return (
+                        <div
+                          key={p.id}
+                          style={{ ...styles.cardProduto, border: selecionado ? '2px solid var(--rosa)' : '2px solid transparent', background: selecionado ? '#fff8f8' : '#fff' }}
+                          onClick={() => toggleKitPersonalizado(p)}
+                          className={`animate-fade delay-${Math.min(i+1,5)}`}
+                        >
+                          <div style={styles.produtoImagemWrapper}>
+                            <img src={p.foto || 'https://placehold.co/300x200?text=Sem+foto'} alt={p.nome} style={styles.produtoFoto} />
+                            <div style={{ ...styles.checkCircle, background: selecionado ? 'var(--rosa)' : 'rgba(255,255,255,0.9)', color: selecionado ? '#fff' : '#aaa' }}>
+                              {selecionado ? '✓' : '+'}
+                            </div>
+                          </div>
+                          <div style={styles.produtoInfo}>
+                            <span style={styles.produtoMarca}>{p.marca}</span>
+                            <h4 style={styles.produtoNome}>{p.nome}</h4>
+                            <p style={styles.produtoDesc}>{p.descricao}</p>
                           </div>
                         </div>
-                        <div style={styles.produtoInfo}>
-                          <span style={styles.produtoMarca}>{p.marca}</span>
-                          <h4 style={styles.produtoNome}>{p.nome}</h4>
-                          <p style={styles.produtoDesc}>{p.descricao}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </>
         )}
       </main>
+
+      <footer style={styles.footer}>
+        <p>🌸 Lu Perfumes & Presentes</p>
+        <p style={{ fontSize: 13, marginTop: 4, opacity: 0.7 }}>Feito com carinho 💛</p>
+      </footer>
     </div>
   );
 }
@@ -219,8 +297,8 @@ const styles = {
   page: { background: 'var(--bege)', minHeight: '100vh' },
   hero: { background: 'linear-gradient(135deg, var(--rosa) 0%, #c99190 100%)', padding: '60px 24px 80px' },
   heroContent: { maxWidth: 700, margin: '0 auto', textAlign: 'center', color: '#fff' },
-  heroBadge: { background: 'rgba(255,255,255,0.2)', padding: '6px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600 },
-  heroTitulo: { fontSize: 42, fontWeight: 800, margin: '16px 0 12px' },
+  heroBadge: { display: 'inline-block', background: 'rgba(255,255,255,0.2)', padding: '6px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 },
+  heroTitulo: { fontSize: 42, fontWeight: 800, margin: '0 0 12px' },
   heroSubtitulo: { fontSize: 17, opacity: 0.9, lineHeight: 1.6, marginBottom: 36 },
   heroAbas: { display: 'flex', gap: 12, justifyContent: 'center' },
   heroAba: { padding: '12px 28px', borderRadius: 50, border: '2px solid rgba(255,255,255,0.5)', background: 'transparent', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'all 0.2s' },
@@ -233,7 +311,7 @@ const styles = {
   vazioTexto: { fontSize: 15, color: '#888', marginBottom: 24, lineHeight: 1.6 },
   btnMontarKit: { background: 'var(--rosa)', color: '#fff', padding: '14px 32px', borderRadius: 50, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' },
   gridKits: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 24 },
-  cardKit: { background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)' },
+  cardKit: { background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', transition: 'all 0.3s' },
   kitImagemWrapper: { position: 'relative' },
   kitFoto: { width: '100%', height: 220, objectFit: 'cover' },
   kitBadge: { position: 'absolute', top: 16, left: 16, background: 'var(--rosa)', color: '#fff', padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700 },
@@ -245,7 +323,7 @@ const styles = {
   kitItensList: { display: 'flex', flexWrap: 'wrap', gap: 8 },
   kitItemChip: { background: 'var(--bege)', padding: '6px 12px', borderRadius: 20, fontSize: 13, color: 'var(--texto)', fontWeight: 500 },
   btnInteresse: { width: '100%', background: '#25D366', color: '#fff', padding: '14px 0', borderRadius: 50, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' },
-  personalizado: { display: 'flex', flexDirection: 'column', gap: 24 },
+  personalizado: { display: 'flex', flexDirection: 'column', gap: 20 },
   instrucao: { background: '#fff', borderRadius: 16, padding: '20px 24px', display: 'flex', gap: 16, alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' },
   instrucaoEmoji: { fontSize: 32, flexShrink: 0 },
   instrucaoTitulo: { fontSize: 16, fontWeight: 700, color: 'var(--texto)', marginBottom: 4 },
@@ -261,12 +339,21 @@ const styles = {
   resumoItemNome: { fontSize: 14, fontWeight: 600, color: 'var(--texto)' },
   removerItem: { background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: 16, padding: 4 },
   btnEnviar: { width: '100%', background: '#25D366', color: '#fff', padding: '14px 0', borderRadius: 50, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' },
+  buscaWrapper: { background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: 14 },
+  buscaInput: { display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: 50, padding: '0 16px', gap: 8 },
+  buscaIcone: { fontSize: 16, flexShrink: 0 },
+  input: { flex: 1, border: 'none', background: 'transparent', padding: '12px 0', fontSize: 14, outline: 'none', fontFamily: 'inherit', color: 'var(--texto)' },
+  buscaLimpar: { background: 'none', border: 'none', color: '#aaa', fontSize: 14, cursor: 'pointer', padding: 4 },
+  filtrosBusca: { display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' },
+  filtroBuscaBtn: { padding: '8px 18px', borderRadius: 50, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' },
+  loginDica: { fontSize: 13, color: '#888' },
+  resultadoBusca: { fontSize: 13, color: '#aaa', paddingLeft: 4 },
   gridProdutos: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 },
   cardProduto: { borderRadius: 16, overflow: 'hidden', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
   produtoImagemWrapper: { position: 'relative' },
   produtoFoto: { width: '100%', height: 160, objectFit: 'cover', display: 'block' },
   checkCircle: { position: 'absolute', top: 10, right: 10, width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.15)', transition: 'all 0.2s' },
-  produtoInfo: { padding: '12px 16px' },
+  produtoInfo: { padding: '12px 16px', background: '#fff' },
   produtoMarca: { fontSize: 10, fontWeight: 700, color: 'var(--verde)', textTransform: 'uppercase', letterSpacing: 1, display: 'block', marginBottom: 4 },
   produtoNome: { fontSize: 14, fontWeight: 700, color: 'var(--texto)', marginBottom: 4 },
   produtoDesc: { fontSize: 12, color: '#aaa', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' },

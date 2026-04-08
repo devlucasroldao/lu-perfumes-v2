@@ -1,6 +1,8 @@
 import '../styles/globals.css';
 import Footer from '../components/Footer';
 import Head from 'next/head';
+import AvaliacaoGoogle from '../components/AvaliacaoGoogle';
+import GoogleAnalytics from '../components/GoogleAnalytics';
 
 export default function App({ Component, pageProps }) {
   return (
@@ -10,7 +12,9 @@ export default function App({ Component, pageProps }) {
         <meta name="theme-color" content="#78825B" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
+      <GoogleAnalytics />
       <Component {...pageProps} />
+      <AvaliacaoGoogle />
       <Footer />
     </>
   );
