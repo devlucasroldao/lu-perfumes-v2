@@ -22,7 +22,7 @@ export default function Sobre() {
 
       {/* Hero */}
       <section style={styles.hero}>
-        <div style={styles.heroContent}>
+        <div style={styles.heroContent} className="sobre-hero-grid">
           <div style={styles.fotoWrapper} className="animate-fade-left">
             <img src="/lu-foto.jpg" alt="Lu" style={styles.foto} />
             <div style={styles.fotoBadge}>🌸 Revendedora oficial</div>
@@ -53,7 +53,7 @@ export default function Sobre() {
 
       {/* História */}
       <section style={styles.section}>
-        <div style={styles.historia}>
+        <div style={styles.historia} className="historia-grid">
           <div style={styles.historiaTexto} className="animate-fade-left">
             <div style={styles.sectionBadge}>💛 Minha história</div>
             <h2 style={styles.sectionTitulo}>De onde veio essa paixão?</h2>
@@ -85,7 +85,7 @@ export default function Sobre() {
         <div style={styles.marcasContent}>
           <div style={styles.sectionBadge}>💄 Marcas que trabalho</div>
           <h2 style={styles.sectionTitulo}>Produtos originais das melhores marcas</h2>
-          <div style={styles.marcasGrid} className="animate-fade delay-2">
+          <div style={styles.marcasGrid} className="animate-fade delay-2 marcas-grid-mobile">
             {['O Boticário', 'Natura', 'Eudora', 'Avon', 'Mary Kay'].map(m => (
               <Link key={m} href={`/catalogo?marca=${m}`} style={styles.marcaCard} className="card-hover">
                 <span style={styles.marcaEmoji}>🌸</span>

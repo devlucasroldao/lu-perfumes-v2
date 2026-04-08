@@ -134,7 +134,7 @@ export default function DetalhesProduto() {
         </div>
 
         {/* Produto principal */}
-        <div style={styles.produto}>
+        <div style={styles.produto} className="produto-grid">
           {/* Foto */}
           <div style={styles.fotoWrapper}>
             <img

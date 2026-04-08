@@ -123,7 +123,7 @@ export default function Catalogo() {
       </div>
 
       <main style={styles.main}>
-        <div style={styles.layout}>
+        <div style={styles.layout} className="catalogo-layout">
 
           {/* Sidebar */}
           <aside style={{ ...styles.sidebar, display: sidebarAberta ? 'flex' : 'none' }}>
@@ -208,7 +208,7 @@ export default function Catalogo() {
             </div>
 
             {carregando ? (
-              <div style={styles.grid}>
+              <div style={styles.grid} className="produtos-grid">
                 {[1,2,3,4,5,6].map(i => (
                   <div key={i} style={{ borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
                     <div className="skeleton" style={{ height: 240 }} />
@@ -228,7 +228,7 @@ export default function Catalogo() {
                 <button style={styles.limparBtn2} onClick={limparFiltros}>Limpar filtros</button>
               </div>
             ) : (
-              <div style={styles.grid}>
+              <div style={styles.grid} className="produtos-grid">
                 {produtosFiltrados.map((p, i) => (
                   <div key={p.id} className={`animate-fade delay-${Math.min(i + 1, 5)}`}>
                     <ProdutoCard produto={p} onAddSacola={addSacola} />

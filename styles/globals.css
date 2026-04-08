@@ -48,9 +48,9 @@ button { cursor: pointer; border: none; outline: none; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
 }
 
 @keyframes shimmer {
@@ -58,78 +58,30 @@ button { cursor: pointer; border: none; outline: none; }
   100% { background-position: 200% 0; }
 }
 
-/* ─── CLASSES DE ANIMAÇÃO ─── */
+.animate-fade { animation: fadeIn 0.5s ease forwards; }
+.animate-fade-left { animation: fadeInLeft 0.5s ease forwards; }
+.animate-fade-right { animation: fadeInRight 0.5s ease forwards; }
+.animate-scale { animation: scaleIn 0.4s ease forwards; }
+.animate-slide-down { animation: slideDown 0.3s ease forwards; }
 
-.animate-fade {
-  animation: fadeIn 0.5s ease forwards;
-}
-
-.animate-fade-left {
-  animation: fadeInLeft 0.5s ease forwards;
-}
-
-.animate-fade-right {
-  animation: fadeInRight 0.5s ease forwards;
-}
-
-.animate-scale {
-  animation: scaleIn 0.4s ease forwards;
-}
-
-.animate-slide-down {
-  animation: slideDown 0.3s ease forwards;
-}
-
-/* Delays para animações em sequência */
 .delay-1 { animation-delay: 0.1s; opacity: 0; }
 .delay-2 { animation-delay: 0.2s; opacity: 0; }
 .delay-3 { animation-delay: 0.3s; opacity: 0; }
 .delay-4 { animation-delay: 0.4s; opacity: 0; }
 .delay-5 { animation-delay: 0.5s; opacity: 0; }
 
-/* ─── HOVER EFFECTS GLOBAIS ─── */
-
 a:hover { opacity: 0.85; }
-
 button:active { transform: scale(0.97); }
 
-/* Cards com hover */
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.12) !important;
-}
+.card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12) !important; }
 
-/* Botões com hover */
-.btn-hover {
-  transition: all 0.2s ease;
-}
-.btn-hover:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-}
+.btn-hover { transition: all 0.2s ease; }
+.btn-hover:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
-/* Links com underline animado */
-.link-hover {
-  position: relative;
-}
-.link-hover::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--verde);
-  transition: width 0.3s ease;
-}
-.link-hover:hover::after {
-  width: 100%;
-}
-
-/* ─── LOADING SKELETON ─── */
+.link-hover { position: relative; }
+.link-hover::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--verde); transition: width 0.3s ease; }
+.link-hover:hover::after { width: 100%; }
 
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -138,57 +90,138 @@ button:active { transform: scale(0.97); }
   border-radius: 8px;
 }
 
-/* ─── SCROLL SUAVE ─── */
-
-html {
-  scroll-behavior: smooth;
+/* Indicador de scroll */
+.scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: bounce 2s infinite;
+  cursor: pointer;
+}
+.scroll-indicator svg {
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
 }
 
-/* ─── SELEÇÃO DE TEXTO ─── */
+html { scroll-behavior: smooth; }
+::selection { background: var(--rosa); color: #fff; }
 
-::selection {
-  background: var(--rosa);
-  color: #fff;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bege); }
+::-webkit-scrollbar-thumb { background: var(--verde); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rosa); }
 
-/* ─── SCROLLBAR PERSONALIZADA ─── */
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bege);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--verde);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--rosa);
-}
-
-/* ─── RESPONSIVO ─── */
+/* ─── RESPONSIVO MOBILE ─── */
 
 @media (max-width: 768px) {
+
+  /* Navbar */
   .nav-links { display: none !important; }
-  .nav-logo { font-size: 15px !important; }
-  .nav-container { padding: 0 16px !important; }
-  .catalogo-layout { grid-template-columns: 1fr !important; }
-  .catalogo-sidebar { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; }
-  .catalogo-topo { flex-direction: column !important; align-items: flex-start !important; }
-  .catalogo-busca { width: 100% !important; }
-  .produtos-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+  .nav-hamburguer { display: flex !important; }
+
+  /* Hero home */
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    border-radius: 12px !important;
+  }
+
+  /* Grids de produtos */
+  .produtos-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  /* Seções */
+  .section-mobile {
+    margin: 32px auto !important;
+    padding: 0 16px !important;
+  }
+
+  /* Catálogo */
+  .catalogo-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .catalogo-sidebar {
+    display: none !important;
+  }
+
+  /* Produto detalhe */
+  .produto-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  /* Sacola */
+  .sacola-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .sacola-resumo-sticky {
+    position: static !important;
+  }
+
+  /* Historia sobre */
+  .historia-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* Hero sobre */
+  .sobre-hero-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    gap: 32px !important;
+  }
+
+  /* Kits */
+  .kits-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Marcas */
+  .marcas-grid-mobile {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Admin */
   .admin-grid2 { grid-template-columns: 1fr !important; }
   .admin-grid2 > * { grid-column: 1 !important; }
-  .admin-item { flex-direction: column !important; align-items: flex-start !important; }
-  .banner-titulo { font-size: 28px !important; }
-  .banner-botoes { flex-direction: column !important; align-items: center !important; }
-  .sacola-item { flex-wrap: wrap !important; }
+
+  /* Avaliação Google */
+  .avaliacao-container {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+  .avaliacao-esquerda {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .avaliacao-direita {
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+
+  /* Footer */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
 }
 
 @media (max-width: 480px) {
-  .produtos-grid { grid-template-columns: 1fr !important; }
+  .produtos-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 @media (min-width: 769px) {

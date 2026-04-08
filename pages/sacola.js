@@ -56,7 +56,7 @@ export default function Sacola() {
             </div>
           </div>
         ) : (
-          <div style={styles.layout}>
+          <div style={styles.layout} className="sacola-layout">
             <div style={styles.lista}>
               <div style={styles.listaHeader}>
                 <h2 style={styles.listaTitulo}>Produtos selecionados</h2>
@@ -81,7 +81,7 @@ export default function Sacola() {
               </div>
             </div>
 
-            <div style={styles.resumo}>
+            <div style={styles.resumo} className="sacola-resumo-sticky">
               <div style={styles.resumoCard}>
                 <h2 style={styles.resumoTitulo}>Resumo</h2>
                 <div style={styles.resumoInfo}>

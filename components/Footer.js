@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function Footer() {
   return (
     <footer style={styles.footer}>
-      <div style={styles.container}>
+      <div style={styles.container} className="footer-grid">
 
         {/* Logo e descrição */}
         <div style={styles.coluna}>

@@ -120,13 +120,24 @@ export default function Home() {
         </div>
 
         {/* Stats */}
-        <div style={styles.statsWrapper} className="animate-fade delay-5">
+        <div style={styles.statsWrapper} className="animate-fade delay-5 hero-stats">
           {stats.map((s, i) => (
             <div key={i} style={styles.statItem}>
               <span style={styles.statNumero}>{s.numero}</span>
               <span style={styles.statLabel}>{s.label}</span>
             </div>
           ))}
+        </div>
+        {/* Indicador de scroll */}
+        <div
+          className="scroll-indicator"
+          style={{ marginTop: 32 }}
+          onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+        >
+          <span>Role para ver mais</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
         </div>
       </section>
 
@@ -172,7 +183,7 @@ export default function Home() {
 
       {/* Destaques */}
       {!temFiltroAtivo && destaques.length > 0 && (
-        <section style={styles.section}>
+        <section style={styles.section} className="section-mobile">
           <div style={styles.sectionHeader} className="animate-fade">
             <div>
               <h2 style={styles.sectionTitulo}>Destaques da semana ⭐</h2>
@@ -223,8 +234,8 @@ export default function Home() {
           )}
         </div>
         {carregando ? (
-          <div style={styles.grid}>
-            {[1,2,3,4].map(i => (
+          <div style={styles.grid} className="produtos-grid">
+            {[1, 2, 3, 4].map(i => (
               <div key={i} style={{ borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
                 <div className="skeleton" style={{ height: 240 }} />
                 <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
