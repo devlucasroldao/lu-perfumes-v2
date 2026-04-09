@@ -71,8 +71,8 @@ export default function Catalogo() {
   const totalFiltros = (filtroLinha !== 'Todos' ? 1 : 0) + (filtroMarca !== 'Todos' ? 1 : 0) + (filtroTipo !== 'Todos' ? 1 : 0);
 
   const GridProdutos = () => carregando ? (
-    <div style={styles.grid}>
-      {[1,2,3,4,5,6].map(i => (
+    <div style={styles.grid} className="grid-produtos">
+      {[1, 2, 3, 4, 5, 6].map(i => (
         <div key={i} style={{ borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
           <div className="skeleton" style={{ height: 200 }} />
           <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -278,13 +278,18 @@ export default function Catalogo() {
       </div>
 
       <style>{`
-        .desktop-only { display: block; }
-        .mobile-only { display: none; }
-        @media (max-width: 768px) {
-          .desktop-only { display: none; }
-          .mobile-only { display: block; }
-        }
-      `}</style>
+  .desktop-only { display: block; }
+  .mobile-only { display: none; }
+  @media (max-width: 768px) {
+    .desktop-only { display: none; }
+    .mobile-only { display: block; }
+    .mobile-only .grid-produtos {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 12px !important;
+    }
+  }
+`}</style>
     </div>
   );
 }
