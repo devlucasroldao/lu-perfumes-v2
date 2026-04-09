@@ -91,7 +91,7 @@ export default function Catalogo() {
       <button style={styles.btnLimparVazio} onClick={limparFiltros}>Limpar filtros</button>
     </div>
   ) : (
-    <div style={styles.grid}>
+    <div style={styles.gridMobile}>
       {produtosFiltrados.map((p, i) => (
         <div key={p.id} className={`animate-fade delay-${Math.min(i + 1, 5)}`}>
           <ProdutoCard produto={p} onAddSacola={addSacola} />
@@ -281,13 +281,8 @@ export default function Catalogo() {
   .desktop-only { display: block; }
   .mobile-only { display: none; }
   @media (max-width: 768px) {
-    .desktop-only { display: none; }
-    .mobile-only { display: block; }
-    .mobile-only .grid-produtos {
-      display: grid !important;
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 12px !important;
-    }
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
   }
 `}</style>
     </div>
@@ -345,6 +340,7 @@ const styles = {
   filtrosOpcoes: { display: 'flex', flexWrap: 'wrap', gap: 8 },
   opcaoBtn: { padding: '8px 16px', borderRadius: 50, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' },
   mainMobile: { padding: '12px 12px 80px' },
+  gridMobile: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 },
 
   // ─── COMPARTILHADOS ───
   filtrosAtivos: { display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 12 },
