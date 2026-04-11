@@ -93,7 +93,7 @@ export default function DetalhesProduto() {
   };
 
   const enviarWhatsApp = () => {
-    const numero = '5551980272657;
+    const numero = '5551980272657';
     const mensagem = `Olá Lu! 🌸 Tenho interesse no produto *${produto.nome}* da ${produto.marca}. Poderia me passar mais informações?`;
     window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
   };
