@@ -98,6 +98,21 @@ export default function DetalhesProduto() {
     window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
   };
 
+  const compartilhar = () => {
+    const url = window.location.href;
+    const mensagem = `Olha esse produto que achei na Lu Perfumes! 🌸\n\n*${produto.nome}* — ${produto.marca}\n\n${url}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: produto.nome,
+        text: `${produto.nome} — ${produto.marca}`,
+        url: url,
+      });
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank');
+    }
+  };
+
   if (carregando) return (
     <div>
       <Navbar sacolaCount={sacola.length} />
@@ -177,6 +192,9 @@ export default function DetalhesProduto() {
               <button style={styles.btnWhats} onClick={enviarWhatsApp}>
                 📲 Consultar preço
               </button>
+              <button style={styles.btnCompartilhar} onClick={compartilhar} className="btn-hover">
+                🔗 Compartilhar produto
+              </button>
             </div>
 
             <Link href="/sacola" style={styles.verSacola}>
@@ -212,6 +230,7 @@ export default function DetalhesProduto() {
 }
 
 const styles = {
+  btnCompartilhar: { padding: '14px 0', borderRadius: 50, color: 'var(--verde)', fontWeight: 700, fontSize: 15, border: '2px solid var(--verde)', cursor: 'pointer', background: 'transparent', textAlign: 'center', transition: 'all 0.2s' },
   loading: { textAlign: 'center', padding: '80px 24px', color: '#aaa', fontSize: 16 },
   btnVoltar: { display: 'inline-block', marginTop: 16, background: 'var(--rosa)', color: '#fff', padding: '12px 24px', borderRadius: 50, fontWeight: 700 },
   main: { maxWidth: 1100, margin: '40px auto', padding: '0 24px' },
