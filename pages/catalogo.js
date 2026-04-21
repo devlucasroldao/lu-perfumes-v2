@@ -280,9 +280,30 @@ export default function Catalogo() {
       <style>{`
   .desktop-only { display: block; }
   .mobile-only { display: none; }
+
   @media (max-width: 768px) {
     .desktop-only { display: none !important; }
     .mobile-only { display: block !important; }
+  }
+
+  .grid-produtos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .grid-produtos {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+      width: 100% !important;
+      overflow: hidden !important;
+    }
+
+    .mobile-only {
+      overflow-x: hidden !important;
+      width: 100% !important;
+    }
   }
 `}</style>
     </div>
@@ -339,13 +360,13 @@ const styles = {
   abaIndicador: { position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: 'var(--rosa)', display: 'block' },
   filtrosOpcoes: { display: 'flex', flexWrap: 'wrap', gap: 8 },
   opcaoBtn: { padding: '8px 16px', borderRadius: 50, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' },
-  mainMobile: { padding: '12px 12px 80px' },
+  mainMobile: { padding: '12px 12px 80px', overflowX: 'hidden', width: '100%' },
   gridMobile: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 },
 
   // ─── COMPARTILHADOS ───
   filtrosAtivos: { display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 12 },
   tagAtiva: { background: 'var(--verde)', color: '#fff', padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 },
   vazio: { textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' },
   vazioEmoji: { fontSize: 48, display: 'block', marginBottom: 12 },
   vazioTitulo: { fontSize: 18, fontWeight: 700, color: 'var(--texto)', marginBottom: 8 },
