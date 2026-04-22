@@ -290,6 +290,7 @@ export default function Catalogo() {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
+    width: 100%;
   }
 
   @media (max-width: 768px) {
@@ -297,11 +298,19 @@ export default function Catalogo() {
       grid-template-columns: repeat(2, 1fr) !important;
       gap: 10px !important;
       width: 100% !important;
-      overflow: hidden !important;
+      box-sizing: border-box !important;
     }
 
     .mobile-only {
       overflow-x: hidden !important;
+      width: 100vw !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .mobile-only main {
+      padding: 12px !important;
+      box-sizing: border-box !important;
       width: 100% !important;
     }
   }
@@ -366,7 +375,7 @@ const styles = {
   // ─── COMPARTILHADOS ───
   filtrosAtivos: { display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 12 },
   tagAtiva: { background: 'var(--verde)', color: '#fff', padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 },
   vazio: { textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' },
   vazioEmoji: { fontSize: 48, display: 'block', marginBottom: 12 },
   vazioTitulo: { fontSize: 18, fontWeight: 700, color: 'var(--texto)', marginBottom: 8 },

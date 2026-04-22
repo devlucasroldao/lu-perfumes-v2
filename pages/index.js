@@ -181,22 +181,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Destaques */}
-      {!temFiltroAtivo && destaques.length > 0 && (
-        <section style={styles.section} className="section-mobile">
-          <div style={styles.sectionHeader} className="animate-fade">
-            <div>
-              <h2 style={styles.sectionTitulo}>Destaques da semana ⭐</h2>
-              <p style={styles.sectionSubtitulo}>Os queridinhos da Lu selecionados especialmente pra você</p>
-            </div>
-            <Link href="/catalogo" style={styles.verTodos} className="link-hover">Ver todos →</Link>
-          </div>
-          <div style={styles.grid}>
-            {destaques.map((p, i) => (
-              <div key={p.id} className={`animate-fade delay-${Math.min(i + 1, 5)}`}>
-                <ProdutoCard produto={p} onAddSacola={addSacola} />
+      {/* Seção Kits */}
+      {!temFiltroAtivo && (
+        <section style={styles.kitsSection}>
+          <div style={styles.kitsContent} className="animate-fade">
+            <div style={styles.kitsEsquerda}>
+              <span style={styles.kitsEmoji}>🎁</span>
+              <div>
+                <h2 style={styles.kitsTitulo}>Precisa de um presente especial?</h2>
+                <p style={styles.kitsTexto}>A Lu monta kits personalizados pra qualquer ocasião — aniversário, chá de bebê, Dia das Mães e muito mais!</p>
+                <div style={styles.kitsBotoes}>
+                  <Link href="/kits" style={styles.btnKitsPrimario} className="btn-hover">🎀 Ver Kits Prontos</Link>
+                  <Link href="/kits" style={styles.btnKitsSecundario} className="btn-hover">✨ Montar o Meu Kit</Link>
+                </div>
               </div>
-            ))}
+            </div>
+            <div style={styles.kitsDireita}>
+              {[
+                { emoji: '💐', titulo: 'Dia das Mães', desc: 'Kits especiais pra ela' },
+                { emoji: '🍼', titulo: 'Chá de Bebê', desc: 'Linha baby completa' },
+                { emoji: '🎂', titulo: 'Aniversário', desc: 'Presentes inesquecíveis' },
+                { emoji: '💑', titulo: 'Namorados', desc: 'Surpresas românticas' },
+              ].map((item, i) => (
+                <Link key={i} href="/kits" style={styles.kitCard} className="card-hover">
+                  <span style={styles.kitCardEmoji}>{item.emoji}</span>
+                  <div>
+                    <p style={styles.kitCardTitulo}>{item.titulo}</p>
+                    <p style={styles.kitCardDesc}>{item.desc}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -332,4 +347,18 @@ const styles = {
   bannerKitsBotoes: { display: 'flex', gap: 12, flexWrap: 'wrap' },
   bannerKitsBtnPrimario: { background: '#fff', color: 'var(--rosa)', padding: '14px 28px', borderRadius: 50, fontWeight: 700, fontSize: 15 },
   bannerKitsBtnSecundario: { background: 'transparent', color: '#fff', padding: '14px 28px', borderRadius: 50, fontWeight: 700, fontSize: 15, border: '2px solid rgba(255,255,255,0.6)' },
+  kitsSection: { background: '#fff', padding: '60px 24px', marginBottom: 0 },
+  kitsContent: { maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' },
+  kitsEsquerda: { display: 'flex', gap: 20, alignItems: 'flex-start' },
+  kitsEmoji: { fontSize: 56, flexShrink: 0 },
+  kitsTitulo: { fontSize: 26, fontWeight: 800, color: 'var(--texto)', marginBottom: 8, lineHeight: 1.3 },
+  kitsTexto: { fontSize: 15, color: '#888', lineHeight: 1.7, marginBottom: 24 },
+  kitsBotoes: { display: 'flex', gap: 12, flexWrap: 'wrap' },
+  btnKitsPrimario: { background: 'var(--rosa)', color: '#fff', padding: '12px 24px', borderRadius: 50, fontWeight: 700, fontSize: 14 },
+  btnKitsSecundario: { background: 'transparent', color: 'var(--verde)', padding: '12px 24px', borderRadius: 50, fontWeight: 700, fontSize: 14, border: '2px solid var(--verde)' },
+  kitsDireita: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
+  kitCard: { background: 'var(--bege)', borderRadius: 16, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'center', transition: 'all 0.2s' },
+  kitCardEmoji: { fontSize: 28, flexShrink: 0 },
+  kitCardTitulo: { fontSize: 14, fontWeight: 700, color: 'var(--texto)', marginBottom: 2 },
+  kitCardDesc: { fontSize: 12, color: '#888' },
 };
