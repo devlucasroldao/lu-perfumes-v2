@@ -13,15 +13,19 @@ export default function Admin() {
   const [produtos, setProdutos] = useState([]);
   const [formProduto, setFormProduto] = useState(produtoVazio);
   const [editandoProduto, setEditandoProduto] = useState(null);
+  const [buscaProduto, setBuscaProduto] = useState('');
 
   const [kits, setKits] = useState([]);
   const [formKit, setFormKit] = useState(kitVazio);
   const [editandoKit, setEditandoKit] = useState(null);
   const [produtosDoKit, setProdutosDoKit] = useState([]);
+  const [buscaKit, setBuscaKit] = useState('');
+  const [buscaProdutoKit, setBuscaProdutoKit] = useState('');
 
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const [tipoMensagem, setTipoMensagem] = useState('sucesso');
 
   useEffect(() => { buscarTudo(); }, []);
 
@@ -34,21 +38,44 @@ export default function Admin() {
     setCarregando(false);
   };
 
-  const mostrarMensagem = (msg) => {
+  const mostrarMensagem = (msg, tipo = 'sucesso') => {
     setMensagem(msg);
+    setTipoMensagem(tipo);
     setTimeout(() => setMensagem(''), 3000);
   };
 
+  // ─── PRODUTOS ───
+
   const salvarProduto = async () => {
-    if (!formProduto.nome || !formProduto.marca) { mostrarMensagem('⚠️ Nome e marca são obrigatórios!'); return; }
-    setSalvando(true);
-    if (editandoProduto) {
-      await supabase.from('produtos').update(formProduto).eq('id', editandoProduto);
-      mostrarMensagem('✅ Produto atualizado!');
-    } else {
-      await supabase.from('produtos').insert([formProduto]);
-      mostrarMensagem('✅ Produto adicionado!');
+    if (!formProduto.nome || !formProduto.marca) {
+      mostrarMensagem('⚠️ Nome e marca são obrigatórios!', 'erro');
+      return;
     }
+    setSalvando(true);
+
+    // Remove o id do payload antes de salvar
+    const { id, ...dadosProduto } = formProduto;
+
+    if (editandoProduto) {
+      const { error } = await supabase
+        .from('produtos')
+        .update(dadosProduto)
+        .eq('id', editandoProduto);
+
+      if (error) {
+        mostrarMensagem('❌ Erro ao atualizar produto!', 'erro');
+      } else {
+        mostrarMensagem('✅ Produto atualizado com sucesso!');
+      }
+    } else {
+      const { error } = await supabase.from('produtos').insert([dadosProduto]);
+      if (error) {
+        mostrarMensagem('❌ Erro ao adicionar produto!', 'erro');
+      } else {
+        mostrarMensagem('✅ Produto adicionado com sucesso!');
+      }
+    }
+
     setFormProduto(produtoVazio);
     setEditandoProduto(null);
     setSalvando(false);
@@ -56,13 +83,13 @@ export default function Admin() {
   };
 
   const editarProduto = (p) => {
-    setFormProduto(p);
+    setFormProduto({ ...p });
     setEditandoProduto(p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const excluirProduto = async (id) => {
-    if (!confirm('Excluir produto?')) return;
+    if (!confirm('Tem certeza que quer excluir esse produto?')) return;
     await supabase.from('produtos').delete().eq('id', id);
     mostrarMensagem('🗑️ Produto removido!');
     buscarTudo();
@@ -73,22 +100,47 @@ export default function Admin() {
     buscarTudo();
   };
 
+  const produtosFiltrados = produtos.filter(p =>
+    p.nome?.toLowerCase().includes(buscaProduto.toLowerCase()) ||
+    p.marca?.toLowerCase().includes(buscaProduto.toLowerCase())
+  );
+
+  // ─── KITS ───
+
   const salvarKit = async () => {
-    if (!formKit.nome) { mostrarMensagem('⚠️ Nome do kit é obrigatório!'); return; }
+    if (!formKit.nome) {
+      mostrarMensagem('⚠️ Nome do kit é obrigatório!', 'erro');
+      return;
+    }
     setSalvando(true);
+
+    const { id, kit_produtos, ...dadosKit } = formKit;
     let kitId = editandoKit;
+
     if (editandoKit) {
-      await supabase.from('kits').update(formKit).eq('id', editandoKit);
+      const { error } = await supabase.from('kits').update(dadosKit).eq('id', editandoKit);
+      if (error) {
+        mostrarMensagem('❌ Erro ao atualizar kit!', 'erro');
+        setSalvando(false);
+        return;
+      }
       await supabase.from('kit_produtos').delete().eq('kit_id', editandoKit);
     } else {
-      const { data } = await supabase.from('kits').insert([formKit]).select();
+      const { data, error } = await supabase.from('kits').insert([dadosKit]).select();
+      if (error) {
+        mostrarMensagem('❌ Erro ao criar kit!', 'erro');
+        setSalvando(false);
+        return;
+      }
       kitId = data?.[0]?.id;
     }
+
     if (produtosDoKit.length > 0) {
       const relacoes = produtosDoKit.map(pid => ({ kit_id: kitId, produto_id: pid }));
       await supabase.from('kit_produtos').insert(relacoes);
     }
-    mostrarMensagem(editandoKit ? '✅ Kit atualizado!' : '✅ Kit criado!');
+
+    mostrarMensagem(editandoKit ? '✅ Kit atualizado com sucesso!' : '✅ Kit criado com sucesso!');
     setFormKit(kitVazio);
     setEditandoKit(null);
     setProdutosDoKit([]);
@@ -97,14 +149,15 @@ export default function Admin() {
   };
 
   const editarKit = (kit) => {
-    setFormKit({ nome: kit.nome, descricao: kit.descricao, ocasiao: kit.ocasiao, foto: kit.foto, ativo: kit.ativo });
+    const { kit_produtos, ...dadosKit } = kit;
+    setFormKit({ ...dadosKit });
     setEditandoKit(kit.id);
     setProdutosDoKit(kit.kit_produtos?.map(kp => kp.produto_id) || []);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const excluirKit = async (id) => {
-    if (!confirm('Excluir kit?')) return;
+    if (!confirm('Tem certeza que quer excluir esse kit?')) return;
     await supabase.from('kits').delete().eq('id', id);
     mostrarMensagem('🗑️ Kit removido!');
     buscarTudo();
@@ -115,6 +168,18 @@ export default function Admin() {
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
   };
+
+  const kitsFiltrados = kits.filter(k =>
+    k.nome?.toLowerCase().includes(buscaKit.toLowerCase()) ||
+    k.ocasiao?.toLowerCase().includes(buscaKit.toLowerCase())
+  );
+
+  const produtosParaKit = produtos.filter(p =>
+    p.ativo && (
+      p.nome?.toLowerCase().includes(buscaProdutoKit.toLowerCase()) ||
+      p.marca?.toLowerCase().includes(buscaProdutoKit.toLowerCase())
+    )
+  );
 
   return (
     <AdminGuard>
@@ -134,8 +199,13 @@ export default function Admin() {
         </div>
 
         <main style={styles.main}>
-          {mensagem && <div style={styles.mensagem}>{mensagem}</div>}
+          {mensagem && (
+            <div style={{ ...styles.mensagem, background: tipoMensagem === 'erro' ? '#f8d7da' : '#d4edda', color: tipoMensagem === 'erro' ? '#842029' : '#155724' }}>
+              {mensagem}
+            </div>
+          )}
 
+          {/* ─── ABA PRODUTOS ─── */}
           {aba === 'produtos' && (
             <>
               <section style={styles.card}>
@@ -169,10 +239,12 @@ export default function Admin() {
                     <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formProduto.descricao} onChange={e => setFormProduto({ ...formProduto, descricao: e.target.value })} placeholder="Descreva o produto..." />
                   </div>
                   <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                    <UploadFoto
-                      fotoAtual={formProduto.foto}
-                      onUpload={(url) => setFormProduto({ ...formProduto, foto: url })}
-                    />
+                    <UploadFoto fotoAtual={formProduto.foto} onUpload={(url) => setFormProduto({ ...formProduto, foto: url })} />
+                    {formProduto.foto && (
+                      <div style={styles.previewWrapper}>
+                        <img src={formProduto.foto} alt="preview" style={styles.previewImg} />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div style={styles.checks}>
@@ -180,30 +252,50 @@ export default function Admin() {
                   <label style={styles.checkLabel}><input type="checkbox" checked={formProduto.ativo} onChange={e => setFormProduto({ ...formProduto, ativo: e.target.checked })} /> ✅ Ativo</label>
                 </div>
                 <div style={styles.botoes}>
-                  <button style={styles.btnSalvar} onClick={salvarProduto} disabled={salvando}>{salvando ? 'Salvando...' : editandoProduto ? '💾 Salvar' : '➕ Adicionar'}</button>
-                  {editandoProduto && <button style={styles.btnCancelar} onClick={() => { setFormProduto(produtoVazio); setEditandoProduto(null); }}>Cancelar</button>}
+                  <button style={styles.btnSalvar} onClick={salvarProduto} disabled={salvando}>
+                    {salvando ? 'Salvando...' : editandoProduto ? '💾 Salvar alterações' : '➕ Adicionar produto'}
+                  </button>
+                  {editandoProduto && (
+                    <button style={styles.btnCancelar} onClick={() => { setFormProduto(produtoVazio); setEditandoProduto(null); }}>
+                      Cancelar
+                    </button>
+                  )}
                 </div>
               </section>
 
               <section style={styles.card}>
-                <h2 style={styles.cardTitulo}>📦 Produtos cadastrados ({produtos.length})</h2>
+                <div style={styles.listaHeader}>
+                  <h2 style={styles.cardTitulo}>📦 Produtos cadastrados ({produtos.length})</h2>
+                  <div style={styles.buscaWrapper}>
+                    <span>🔍</span>
+                    <input
+                      style={styles.buscaInput}
+                      placeholder="Buscar produto..."
+                      value={buscaProduto}
+                      onChange={e => setBuscaProduto(e.target.value)}
+                    />
+                    {buscaProduto && <button style={styles.buscaLimpar} onClick={() => setBuscaProduto('')}>✕</button>}
+                  </div>
+                </div>
+                {buscaProduto && <p style={styles.buscaInfo}>{produtosFiltrados.length} produto(s) encontrado(s)</p>}
                 {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : (
                   <div style={styles.lista}>
-                    {produtos.map(p => (
+                    {produtosFiltrados.map(p => (
                       <div key={p.id} style={{ ...styles.item, opacity: p.ativo ? 1 : 0.5 }}>
                         {p.foto && <img src={p.foto} alt={p.nome} style={styles.itemFoto} />}
                         <div style={styles.itemInfo}>
-                          <strong>{p.nome}</strong>
-                          <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                          <strong style={{ fontSize: 15 }}>{p.nome}</strong>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
                             <span style={styles.tag}>{p.marca}</span>
                             <span style={styles.tag}>{p.linha}</span>
+                            <span style={styles.tag}>{p.tipo}</span>
                             {p.destaque && <span style={{ ...styles.tag, background: '#fff3cd', color: '#856404' }}>⭐ destaque</span>}
                             {!p.ativo && <span style={{ ...styles.tag, background: '#f8d7da', color: '#842029' }}>inativo</span>}
                           </div>
                         </div>
                         <div style={styles.itemAcoes}>
                           <button style={styles.btnToggle} onClick={() => toggleProduto(p)}>{p.ativo ? '⏸️' : '▶️'}</button>
-                          <button style={styles.btnEditar} onClick={() => editarProduto(p)}>✏️</button>
+                          <button style={styles.btnEditar} onClick={() => editarProduto(p)}>✏️ Editar</button>
                           <button style={styles.btnExcluir} onClick={() => excluirProduto(p.id)}>🗑️</button>
                         </div>
                       </div>
@@ -214,6 +306,7 @@ export default function Admin() {
             </>
           )}
 
+          {/* ─── ABA KITS ─── */}
           {aba === 'kits' && (
             <>
               <section style={styles.card}>
@@ -232,17 +325,30 @@ export default function Admin() {
                     <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formKit.descricao} onChange={e => setFormKit({ ...formKit, descricao: e.target.value })} placeholder="Descreva o kit..." />
                   </div>
                   <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                    <UploadFoto
-                      fotoAtual={formKit.foto}
-                      onUpload={(url) => setFormKit({ ...formKit, foto: url })}
-                    />
+                    <UploadFoto fotoAtual={formKit.foto} onUpload={(url) => setFormKit({ ...formKit, foto: url })} />
+                    {formKit.foto && (
+                      <div style={styles.previewWrapper}>
+                        <img src={formKit.foto} alt="preview" style={styles.previewImg} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
+                {/* Busca de produtos para o kit */}
                 <div style={{ marginTop: 24 }}>
                   <label style={styles.label}>Produtos do Kit ({produtosDoKit.length} selecionados)</label>
+                  <div style={{ ...styles.buscaWrapper, margin: '10px 0' }}>
+                    <span>🔍</span>
+                    <input
+                      style={styles.buscaInput}
+                      placeholder="Buscar produto para o kit..."
+                      value={buscaProdutoKit}
+                      onChange={e => setBuscaProdutoKit(e.target.value)}
+                    />
+                    {buscaProdutoKit && <button style={styles.buscaLimpar} onClick={() => setBuscaProdutoKit('')}>✕</button>}
+                  </div>
                   <div style={styles.gridSelecao}>
-                    {produtos.filter(p => p.ativo).map(p => {
+                    {produtosParaKit.map(p => {
                       const selecionado = produtosDoKit.includes(p.id);
                       return (
                         <div
@@ -250,7 +356,9 @@ export default function Admin() {
                           style={{ ...styles.cardSelecao, border: selecionado ? '2px solid var(--verde)' : '2px solid #eee', background: selecionado ? '#f0f4ea' : '#fff' }}
                           onClick={() => toggleProdutoKit(p.id)}
                         >
-                          <span style={{ ...styles.checkSelecao, background: selecionado ? '#78825B' : '#ddd' }}>{selecionado ? '✓' : '+'}</span>
+                          <span style={{ ...styles.checkSelecao, background: selecionado ? '#78825B' : '#ddd' }}>
+                            {selecionado ? '✓' : '+'}
+                          </span>
                           <div>
                             <p style={{ fontWeight: 600, fontSize: 13 }}>{p.nome}</p>
                             <p style={{ fontSize: 11, color: '#888' }}>{p.marca}</p>
@@ -258,6 +366,9 @@ export default function Admin() {
                         </div>
                       );
                     })}
+                    {produtosParaKit.length === 0 && (
+                      <p style={{ color: '#aaa', fontSize: 13, padding: '8px 0' }}>Nenhum produto encontrado</p>
+                    )}
                   </div>
                 </div>
 
@@ -265,22 +376,41 @@ export default function Admin() {
                   <label style={styles.checkLabel}><input type="checkbox" checked={formKit.ativo} onChange={e => setFormKit({ ...formKit, ativo: e.target.checked })} /> ✅ Kit ativo</label>
                 </div>
                 <div style={styles.botoes}>
-                  <button style={styles.btnSalvar} onClick={salvarKit} disabled={salvando}>{salvando ? 'Salvando...' : editandoKit ? '💾 Salvar Kit' : '➕ Criar Kit'}</button>
-                  {editandoKit && <button style={styles.btnCancelar} onClick={() => { setFormKit(kitVazio); setEditandoKit(null); setProdutosDoKit([]); }}>Cancelar</button>}
+                  <button style={styles.btnSalvar} onClick={salvarKit} disabled={salvando}>
+                    {salvando ? 'Salvando...' : editandoKit ? '💾 Salvar Kit' : '➕ Criar Kit'}
+                  </button>
+                  {editandoKit && (
+                    <button style={styles.btnCancelar} onClick={() => { setFormKit(kitVazio); setEditandoKit(null); setProdutosDoKit([]); }}>
+                      Cancelar
+                    </button>
+                  )}
                 </div>
               </section>
 
               <section style={styles.card}>
-                <h2 style={styles.cardTitulo}>🎁 Kits cadastrados ({kits.length})</h2>
-                {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : kits.length === 0 ? (
-                  <p style={{ color: '#aaa' }}>Nenhum kit ainda. Crie o primeiro! 👆</p>
+                <div style={styles.listaHeader}>
+                  <h2 style={styles.cardTitulo}>🎁 Kits cadastrados ({kits.length})</h2>
+                  <div style={styles.buscaWrapper}>
+                    <span>🔍</span>
+                    <input
+                      style={styles.buscaInput}
+                      placeholder="Buscar kit..."
+                      value={buscaKit}
+                      onChange={e => setBuscaKit(e.target.value)}
+                    />
+                    {buscaKit && <button style={styles.buscaLimpar} onClick={() => setBuscaKit('')}>✕</button>}
+                  </div>
+                </div>
+                {buscaKit && <p style={styles.buscaInfo}>{kitsFiltrados.length} kit(s) encontrado(s)</p>}
+                {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : kitsFiltrados.length === 0 ? (
+                  <p style={{ color: '#aaa' }}>Nenhum kit encontrado.</p>
                 ) : (
                   <div style={styles.lista}>
-                    {kits.map(k => (
+                    {kitsFiltrados.map(k => (
                       <div key={k.id} style={{ ...styles.item, opacity: k.ativo ? 1 : 0.5 }}>
                         {k.foto && <img src={k.foto} alt={k.nome} style={styles.itemFoto} />}
                         <div style={styles.itemInfo}>
-                          <strong>{k.nome}</strong>
+                          <strong style={{ fontSize: 15 }}>{k.nome}</strong>
                           <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                             {k.ocasiao && <span style={styles.tag}>{k.ocasiao}</span>}
                             <span style={styles.tag}>{k.kit_produtos?.length || 0} produtos</span>
@@ -309,17 +439,24 @@ const styles = {
   header: { background: '#fff', padding: '20px 32px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   titulo: { fontSize: 22, fontWeight: 700, color: '#78825B' },
   voltar: { fontSize: 14, color: '#78825B', fontWeight: 600 },
-  abas: { display: 'flex', gap: 0, background: '#fff', borderBottom: '2px solid #eee', padding: '0 32px' },
+  abas: { display: 'flex', background: '#fff', borderBottom: '2px solid #eee', padding: '0 32px' },
   aba: { padding: '16px 24px', border: 'none', background: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: '#999', borderBottom: '3px solid transparent', marginBottom: -2 },
   abaAtiva: { color: '#78825B', borderBottom: '3px solid #78825B' },
   main: { maxWidth: 960, margin: '32px auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 32 },
-  mensagem: { background: '#d4edda', color: '#155724', padding: '12px 16px', borderRadius: 8, fontSize: 14 },
+  mensagem: { padding: '12px 16px', borderRadius: 8, fontSize: 14, fontWeight: 600 },
   card: { background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' },
-  cardTitulo: { fontSize: 18, fontWeight: 700, marginBottom: 24, color: '#3a3a3a' },
-  grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 },
+  cardTitulo: { fontSize: 18, fontWeight: 700, color: '#3a3a3a', marginBottom: 0 },
+  listaHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 },
+  buscaWrapper: { display: 'flex', alignItems: 'center', gap: 8, background: '#f5f5f5', borderRadius: 50, padding: '8px 16px', minWidth: 240 },
+  buscaInput: { flex: 1, border: 'none', background: 'transparent', fontSize: 13, outline: 'none', fontFamily: 'inherit' },
+  buscaLimpar: { background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: 14, padding: 2 },
+  buscaInfo: { fontSize: 12, color: '#aaa', marginBottom: 12 },
+  grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 },
   campo: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: 12, fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: 0.5 },
   input: { padding: '10px 14px', borderRadius: 8, border: '2px solid #eee', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: '#fff' },
+  previewWrapper: { marginTop: 12, borderRadius: 12, overflow: 'hidden', border: '2px solid #eee', background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 },
+  previewImg: { width: '100%', maxHeight: 300, objectFit: 'contain', borderRadius: 10 },
   checks: { display: 'flex', gap: 24, margin: '16px 0' },
   checkLabel: { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' },
   botoes: { display: 'flex', gap: 12 },
