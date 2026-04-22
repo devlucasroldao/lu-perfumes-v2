@@ -56,7 +56,7 @@ export default function Sacola() {
             </div>
           </div>
         ) : (
-          <div style={styles.layout} className="sacola-layout">
+          <div style={styles.layout}>
             <div style={styles.lista}>
               <div style={styles.listaHeader}>
                 <h2 style={styles.listaTitulo}>Produtos selecionados</h2>
@@ -69,7 +69,13 @@ export default function Sacola() {
                   <div style={styles.itemInfo}>
                     <span style={styles.itemMarca}>{produto.marca}</span>
                     <h3 style={styles.itemNome}>{produto.nome}</h3>
-                    <p style={styles.itemDesc}>{produto.descricao}</p>
+                    {produto.descricao && (
+                      <p style={styles.itemDesc}>
+                        {produto.descricao.length > 60
+                          ? produto.descricao.substring(0, 60) + '...'
+                          : produto.descricao}
+                      </p>
+                    )}
                     <Link href={`/produto/${produto.id}`} style={styles.itemLink}>Ver detalhes →</Link>
                   </div>
                   <button style={styles.itemRemover} onClick={() => remover(index)}>✕</button>
@@ -81,7 +87,7 @@ export default function Sacola() {
               </div>
             </div>
 
-            <div style={styles.resumo} className="sacola-resumo-sticky">
+            <div style={styles.resumo}>
               <div style={styles.resumoCard}>
                 <h2 style={styles.resumoTitulo}>Resumo</h2>
                 <div style={styles.resumoInfo}>
@@ -94,11 +100,11 @@ export default function Sacola() {
                 </div>
                 <button style={styles.btnWhats} onClick={enviarWhatsApp}>
                   <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 20, height: 20 }}>
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                   </svg>
                   Enviar para WhatsApp da Lu
                 </button>
-                <p style={styles.resumoRodape}>A Lu vai responder com os preços e disponibilidade de cada produto 🌸</p>
+                <p style={styles.resumoRodape}>A Lu vai responder com os preços e disponibilidade 🌸</p>
               </div>
 
               <div style={styles.sugestao}>
@@ -135,13 +141,13 @@ const styles = {
   listaHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   listaTitulo: { fontSize: 18, fontWeight: 700, color: 'var(--texto)' },
   btnLimpar: { background: 'none', border: 'none', color: '#ccc', fontSize: 13, cursor: 'pointer', fontWeight: 600 },
-  item: { background: '#fff', borderRadius: 16, padding: 20, display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' },
-  itemFoto: { width: 100, height: 100, objectFit: 'cover', borderRadius: 12, flexShrink: 0 },
-  itemInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: 4 },
+  item: { background: '#fff', borderRadius: 16, padding: 16, display: 'flex', gap: 14, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' },
+  itemFoto: { width: 80, height: 80, objectFit: 'cover', borderRadius: 10, flexShrink: 0 },
+  itemInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: 3 },
   itemMarca: { fontSize: 10, fontWeight: 700, color: 'var(--verde)', textTransform: 'uppercase', letterSpacing: 1.5 },
-  itemNome: { fontSize: 16, fontWeight: 700, color: 'var(--texto)' },
-  itemDesc: { fontSize: 13, color: '#aaa', lineHeight: 1.5 },
-  itemLink: { fontSize: 13, color: 'var(--rosa)', fontWeight: 600, marginTop: 4 },
+  itemNome: { fontSize: 15, fontWeight: 700, color: 'var(--texto)' },
+  itemDesc: { fontSize: 12, color: '#aaa', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' },
+  itemLink: { fontSize: 12, color: 'var(--rosa)', fontWeight: 600, marginTop: 2 },
   itemRemover: { background: 'none', border: 'none', color: '#ddd', fontSize: 18, cursor: 'pointer', flexShrink: 0, padding: 4 },
   continuar: { textAlign: 'center', paddingTop: 8 },
   btnContinuar: { color: 'var(--verde)', fontWeight: 600, fontSize: 14 },
