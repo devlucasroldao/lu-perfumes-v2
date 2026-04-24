@@ -1,13 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import ProdutoCard from '../components/ProdutoCard';
 import { supabase } from '../lib/supabase';
 import Head from 'next/head';
 
+const categorias = [
+  { value: 'todos', label: 'Todos', emoji: '✨' },
+  { value: 'perfumaria', label: 'Perfumaria', emoji: '🌸' },
+  { value: 'maquiagem', label: 'Maquiagem', emoji: '💄' },
+  { value: 'corpo_banho', label: 'Corpo e Banho', emoji: '🛁' },
+  { value: 'skincare', label: 'Skincare', emoji: '✨' },
+  { value: 'cabelos', label: 'Cabelos', emoji: '🧴' },
+];
+
 const linhas = ['Todos', 'feminino', 'masculino', 'kids', 'baby'];
 const marcas = ['Todos', 'O Boticário', 'Natura', 'Eudora', 'Avon', 'Mary Kay'];
 const tipos = ['Todos', 'floral', 'amadeirado', 'citrico', 'doce', 'frutal'];
+
 const linhaEmojis = { feminino: '👩', masculino: '👨', kids: '👧', baby: '👶', Todos: '✨' };
 const tipoEmojis = { floral: '🌸', amadeirado: '🌲', citrico: '🍋', doce: '🍬', frutal: '🍓', Todos: '✨' };
 
@@ -16,13 +26,14 @@ export default function Catalogo() {
   const [sacola, setSacola] = useState([]);
   const [produtos, setProdutos] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [filtroCategoria, setFiltroCategoria] = useState('todos');
   const [filtroLinha, setFiltroLinha] = useState('Todos');
   const [filtroMarca, setFiltroMarca] = useState('Todos');
   const [filtroTipo, setFiltroTipo] = useState('Todos');
   const [busca, setBusca] = useState('');
   const [sidebarAberta, setSidebarAberta] = useState(true);
   const [filtrosMobileAbertos, setFiltrosMobileAbertos] = useState(false);
-  const [abaMobile, setAbaMobile] = useState('linha');
+  const [abaMobile, setAbaMobile] = useState('categoria');
 
   useEffect(() => {
     const salva = localStorage.getItem('sacola');
@@ -35,6 +46,7 @@ export default function Catalogo() {
     if (router.query.marca) setFiltroMarca(router.query.marca);
     if (router.query.tipo) setFiltroTipo(router.query.tipo);
     if (router.query.busca) setBusca(router.query.busca);
+    if (router.query.categoria) setFiltroCategoria(router.query.categoria);
   }, [router.query]);
 
   const buscarProdutos = async () => {
@@ -52,29 +64,36 @@ export default function Catalogo() {
     });
   };
 
-  const produtosFiltrados = produtos.filter(p => {
-    const matchLinha = filtroLinha === 'Todos' || p.linha === filtroLinha;
-    const matchMarca = filtroMarca === 'Todos' || p.marca === filtroMarca;
-    const matchTipo = filtroTipo === 'Todos' || p.tipo === filtroTipo;
-    const matchBusca = p.nome.toLowerCase().includes(busca.toLowerCase()) || p.marca.toLowerCase().includes(busca.toLowerCase());
-    return matchLinha && matchMarca && matchTipo && matchBusca;
-  });
+  const produtosFiltrados = useCallback(() => {
+    return produtos.filter(p => {
+      const matchCategoria = filtroCategoria === 'todos' || p.categoria === filtroCategoria;
+      const matchLinha = filtroLinha === 'Todos' || p.linha === filtroLinha;
+      const matchMarca = filtroMarca === 'Todos' || p.marca === filtroMarca;
+      const matchTipo = filtroTipo === 'Todos' || p.tipo === filtroTipo;
+      const matchBusca = !busca ||
+        p.nome?.toLowerCase().includes(busca.toLowerCase()) ||
+        p.marca?.toLowerCase().includes(busca.toLowerCase()) ||
+        p.categoria?.toLowerCase().includes(busca.toLowerCase());
+      return matchCategoria && matchLinha && matchMarca && matchTipo && matchBusca;
+    });
+  }, [produtos, filtroCategoria, filtroLinha, filtroMarca, filtroTipo, busca])();
 
   const limparFiltros = () => {
+    setFiltroCategoria('todos');
     setFiltroLinha('Todos');
     setFiltroMarca('Todos');
     setFiltroTipo('Todos');
     setBusca('');
   };
 
-  const temFiltroAtivo = filtroLinha !== 'Todos' || filtroMarca !== 'Todos' || filtroTipo !== 'Todos' || busca !== '';
-  const totalFiltros = (filtroLinha !== 'Todos' ? 1 : 0) + (filtroMarca !== 'Todos' ? 1 : 0) + (filtroTipo !== 'Todos' ? 1 : 0);
+  const temFiltroAtivo = filtroCategoria !== 'todos' || filtroLinha !== 'Todos' || filtroMarca !== 'Todos' || filtroTipo !== 'Todos' || busca !== '';
+  const totalFiltros = (filtroCategoria !== 'todos' ? 1 : 0) + (filtroLinha !== 'Todos' ? 1 : 0) + (filtroMarca !== 'Todos' ? 1 : 0) + (filtroTipo !== 'Todos' ? 1 : 0);
 
   const GridProdutos = () => carregando ? (
-    <div style={styles.grid} className="grid-produtos">
-      {[1, 2, 3, 4, 5, 6].map(i => (
+    <div className="grid-produtos">
+      {[1,2,3,4,5,6,7,8].map(i => (
         <div key={i} style={{ borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
-          <div className="skeleton" style={{ height: 200 }} />
+          <div className="skeleton" style={{ height: 220 }} />
           <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div className="skeleton" style={{ height: 10, width: '60%' }} />
             <div className="skeleton" style={{ height: 14, width: '80%' }} />
@@ -91,7 +110,7 @@ export default function Catalogo() {
       <button style={styles.btnLimparVazio} onClick={limparFiltros}>Limpar filtros</button>
     </div>
   ) : (
-    <div style={styles.gridMobile}>
+    <div className="grid-produtos">
       {produtosFiltrados.map((p, i) => (
         <div key={p.id} className={`animate-fade delay-${Math.min(i + 1, 5)}`}>
           <ProdutoCard produto={p} onAddSacola={addSacola} />
@@ -104,41 +123,36 @@ export default function Catalogo() {
     <div style={styles.page}>
       <Head>
         <title>Catálogo — Lu Perfumes & Presentes</title>
-        <meta name="description" content="Explore nosso catálogo completo de perfumes e cosméticos. Filtre por linha, marca e tipo." />
+        <meta name="description" content="Explore nosso catálogo completo de perfumes e cosméticos. Filtre por categoria, marca e tipo." />
       </Head>
 
       <Navbar sacolaCount={sacola.length} />
 
-      {/* ─── VERSÃO DESKTOP ─── */}
+      {/* ─── DESKTOP ─── */}
       <div className="desktop-only">
         <section style={styles.hero}>
           <div style={styles.heroContent}>
             <h1 style={styles.heroTitulo} className="animate-fade delay-1">Catálogo 🌸</h1>
-            <p style={styles.heroSubtitulo} className="animate-fade delay-2">Encontre o perfume ou cosmético perfeito pra você</p>
+            <p style={styles.heroSubtitulo} className="animate-fade delay-2">Encontre o produto perfeito pra você</p>
             <div style={styles.buscaWrapperDesktop} className="animate-fade delay-3">
               <span style={styles.buscaIcone}>🔍</span>
-              <input
-                style={styles.buscaInputDesktop}
-                placeholder="Buscar produto ou marca..."
-                value={busca}
-                onChange={e => setBusca(e.target.value)}
-              />
+              <input style={styles.buscaInputDesktop} placeholder="Buscar produto ou marca..." value={busca} onChange={e => setBusca(e.target.value)} />
               {busca && <button style={styles.buscaLimpar} onClick={() => setBusca('')}>✕</button>}
             </div>
           </div>
         </section>
 
-        <div style={styles.chipsBar}>
-          <div style={styles.chipsScroll}>
-            {linhas.map(l => (
-              <button key={l} style={{ ...styles.chip, background: filtroLinha === l ? 'var(--verde)' : '#fff', color: filtroLinha === l ? '#fff' : 'var(--texto)', border: filtroLinha === l ? '2px solid var(--verde)' : '2px solid #eee' }} onClick={() => setFiltroLinha(l)} className="btn-hover">
-                {linhaEmojis[l] || '•'} {l.charAt(0).toUpperCase() + l.slice(1)}
-              </button>
-            ))}
-            <div style={styles.chipDivisor} />
-            {marcas.map(m => (
-              <button key={m} style={{ ...styles.chip, background: filtroMarca === m ? 'var(--rosa)' : '#fff', color: filtroMarca === m ? '#fff' : 'var(--texto)', border: filtroMarca === m ? '2px solid var(--rosa)' : '2px solid #eee' }} onClick={() => setFiltroMarca(m)} className="btn-hover">
-                {m}
+        {/* Chips de categoria */}
+        <div style={styles.categoriasBar}>
+          <div style={styles.categoriasScroll}>
+            {categorias.map(c => (
+              <button
+                key={c.value}
+                style={{ ...styles.categoriaChip, background: filtroCategoria === c.value ? 'var(--verde)' : '#fff', color: filtroCategoria === c.value ? '#fff' : 'var(--texto)', border: filtroCategoria === c.value ? '2px solid var(--verde)' : '2px solid #eee' }}
+                onClick={() => setFiltroCategoria(c.value)}
+                className="btn-hover"
+              >
+                {c.emoji} {c.label}
               </button>
             ))}
           </div>
@@ -152,6 +166,7 @@ export default function Catalogo() {
                   <h3 style={styles.sidebarTitulo}>Filtros</h3>
                   {temFiltroAtivo && <button style={styles.limparBtn} onClick={limparFiltros}>Limpar tudo</button>}
                 </div>
+
                 {[
                   { titulo: 'Por Linha', opcoes: linhas, filtro: filtroLinha, setFiltro: setFiltroLinha, cor: 'var(--verde)', emojis: linhaEmojis },
                   { titulo: 'Por Marca', opcoes: marcas, filtro: filtroMarca, setFiltro: setFiltroMarca, cor: 'var(--rosa)', emojis: {} },
@@ -180,14 +195,15 @@ export default function Catalogo() {
                   <button style={styles.toggleSidebar} onClick={() => setSidebarAberta(!sidebarAberta)}>
                     {sidebarAberta ? '◀ Esconder filtros' : '▶ Mostrar filtros'}
                   </button>
-                  <p style={styles.resultado}>{carregando ? 'Carregando...' : `${produtosFiltrados.length} produto(s) encontrado(s)`}</p>
+                  <p style={styles.resultado}>{carregando ? 'Carregando...' : `${produtosFiltrados.length} produto(s)`}</p>
                 </div>
                 {temFiltroAtivo && (
                   <div style={styles.filtrosAtivos}>
-                    {filtroLinha !== 'Todos' && <span style={styles.tagAtiva}>{filtroLinha} ✕</span>}
-                    {filtroMarca !== 'Todos' && <span style={{ ...styles.tagAtiva, background: 'var(--rosa)' }}>{filtroMarca} ✕</span>}
-                    {filtroTipo !== 'Todos' && <span style={styles.tagAtiva}>{filtroTipo} ✕</span>}
-                    {busca && <span style={{ ...styles.tagAtiva, background: '#888' }}>"{busca}" ✕</span>}
+                    {filtroCategoria !== 'todos' && <span style={styles.tagAtiva} onClick={() => setFiltroCategoria('todos')}>{categorias.find(c => c.value === filtroCategoria)?.emoji} {filtroCategoria} ✕</span>}
+                    {filtroLinha !== 'Todos' && <span style={styles.tagAtiva} onClick={() => setFiltroLinha('Todos')}>{filtroLinha} ✕</span>}
+                    {filtroMarca !== 'Todos' && <span style={{ ...styles.tagAtiva, background: 'var(--rosa)' }} onClick={() => setFiltroMarca('Todos')}>{filtroMarca} ✕</span>}
+                    {filtroTipo !== 'Todos' && <span style={styles.tagAtiva} onClick={() => setFiltroTipo('Todos')}>{filtroTipo} ✕</span>}
+                    {busca && <span style={{ ...styles.tagAtiva, background: '#888' }} onClick={() => setBusca('')}>"{busca}" ✕</span>}
                   </div>
                 )}
               </div>
@@ -197,7 +213,7 @@ export default function Catalogo() {
         </main>
       </div>
 
-      {/* ─── VERSÃO MOBILE ─── */}
+      {/* ─── MOBILE ─── */}
       <div className="mobile-only">
         <div style={styles.headerMobile}>
           <div style={styles.headerTop}>
@@ -205,27 +221,35 @@ export default function Catalogo() {
               <h1 style={styles.tituloMobile}>Catálogo 🌸</h1>
               <p style={styles.subtituloMobile}>{carregando ? 'Carregando...' : `${produtosFiltrados.length} produtos`}</p>
             </div>
-            {temFiltroAtivo && (
-              <button style={styles.btnLimparTopo} onClick={limparFiltros}>✕ Limpar</button>
-            )}
+            {temFiltroAtivo && <button style={styles.btnLimparTopo} onClick={limparFiltros}>✕ Limpar</button>}
           </div>
 
+          {/* Busca mobile */}
           <div style={styles.buscaWrapperMobile}>
             <span style={styles.buscaIcone}>🔍</span>
-            <input
-              style={styles.buscaInputMobile}
-              placeholder="Buscar produto ou marca..."
-              value={busca}
-              onChange={e => setBusca(e.target.value)}
-            />
+            <input style={styles.buscaInputMobile} placeholder="Buscar produto ou marca..." value={busca} onChange={e => setBusca(e.target.value)} />
             {busca && <button style={styles.buscaLimpar} onClick={() => setBusca('')}>✕</button>}
           </div>
 
+          {/* Chips de categoria mobile — scroll horizontal */}
+          <div style={styles.categoriasMobileScroll}>
+            {categorias.map(c => (
+              <button
+                key={c.value}
+                style={{ ...styles.categoriaChipMobile, background: filtroCategoria === c.value ? 'var(--verde)' : '#fff', color: filtroCategoria === c.value ? '#fff' : 'var(--texto)', border: filtroCategoria === c.value ? '2px solid var(--verde)' : '2px solid #eee' }}
+                onClick={() => setFiltroCategoria(c.value)}
+              >
+                {c.emoji} {c.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Botão filtros avançados */}
           <button
             style={{ ...styles.btnFiltrosMobile, background: filtrosMobileAbertos ? 'var(--verde)' : '#fff', color: filtrosMobileAbertos ? '#fff' : 'var(--texto)' }}
             onClick={() => setFiltrosMobileAbertos(!filtrosMobileAbertos)}
           >
-            <span>⚙️ Filtros</span>
+            <span>⚙️ Filtros avançados</span>
             {totalFiltros > 0 && <span style={styles.filtroBadge}>{totalFiltros}</span>}
             <span style={{ marginLeft: 'auto' }}>{filtrosMobileAbertos ? '▲' : '▼'}</span>
           </button>
@@ -264,9 +288,10 @@ export default function Catalogo() {
 
           {temFiltroAtivo && (
             <div style={styles.filtrosAtivos}>
-              {filtroLinha !== 'Todos' && <span style={styles.tagAtiva} onClick={() => setFiltroLinha('Todos')}>{linhaEmojis[filtroLinha]} {filtroLinha} ✕</span>}
+              {filtroCategoria !== 'todos' && <span style={styles.tagAtiva} onClick={() => setFiltroCategoria('todos')}>{filtroCategoria} ✕</span>}
+              {filtroLinha !== 'Todos' && <span style={styles.tagAtiva} onClick={() => setFiltroLinha('Todos')}>{filtroLinha} ✕</span>}
               {filtroMarca !== 'Todos' && <span style={{ ...styles.tagAtiva, background: 'var(--rosa)' }} onClick={() => setFiltroMarca('Todos')}>{filtroMarca} ✕</span>}
-              {filtroTipo !== 'Todos' && <span style={styles.tagAtiva} onClick={() => setFiltroTipo('Todos')}>{tipoEmojis[filtroTipo]} {filtroTipo} ✕</span>}
+              {filtroTipo !== 'Todos' && <span style={styles.tagAtiva} onClick={() => setFiltroTipo('Todos')}>{filtroTipo} ✕</span>}
               {busca && <span style={{ ...styles.tagAtiva, background: '#888' }} onClick={() => setBusca('')}>"{busca}" ✕</span>}
             </div>
           )}
@@ -278,62 +303,54 @@ export default function Catalogo() {
       </div>
 
       <style>{`
-  .desktop-only { display: block; }
-  .mobile-only { display: none; }
+        .desktop-only { display: block; }
+        .mobile-only { display: none; }
 
-  @media (max-width: 768px) {
-    .desktop-only { display: none !important; }
-    .mobile-only { display: block !important; }
-  }
+        .grid-produtos {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          width: 100%;
+        }
 
-  .grid-produtos {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    width: 100%;
-  }
+        .grid-produtos > div {
+          min-width: 0;
+        }
 
-  @media (max-width: 768px) {
-    .grid-produtos {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 10px !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-    }
+        @media (max-width: 768px) {
+          .desktop-only { display: none !important; }
+          .mobile-only { display: block !important; }
 
-    .mobile-only {
-      overflow-x: hidden !important;
-      width: 100vw !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
+          .grid-produtos {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+        }
 
-    .mobile-only main {
-      padding: 12px !important;
-      box-sizing: border-box !important;
-      width: 100% !important;
-    }
-  }
-`}</style>
+        /* Esconde scrollbar dos chips mobile */
+        .categorias-mobile-scroll::-webkit-scrollbar { display: none; }
+        .categorias-mobile-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }
 
 const styles = {
   page: { background: 'var(--bege)', minHeight: '100vh' },
-
-  // ─── DESKTOP ───
   hero: { background: 'linear-gradient(135deg, var(--rosa) 0%, #c99190 100%)', padding: '48px 24px' },
   heroContent: { maxWidth: 700, margin: '0 auto', textAlign: 'center', color: '#fff' },
   heroTitulo: { fontSize: 36, fontWeight: 800, marginBottom: 8 },
   heroSubtitulo: { fontSize: 16, opacity: 0.9, marginBottom: 24 },
   buscaWrapperDesktop: { display: 'flex', alignItems: 'center', background: '#fff', borderRadius: 50, padding: '0 20px', gap: 8, maxWidth: 480, margin: '0 auto', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' },
   buscaInputDesktop: { flex: 1, border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontFamily: 'inherit', color: 'var(--texto)', background: 'transparent' },
-  chipsBar: { background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '12px 0' },
-  chipsScroll: { maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', gap: 8, overflowX: 'auto', alignItems: 'center' },
-  chip: { padding: '7px 16px', borderRadius: 50, fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s', flexShrink: 0 },
-  chipDivisor: { width: 1, height: 24, background: '#eee', flexShrink: 0, margin: '0 4px' },
-  mainDesktop: { maxWidth: 1200, margin: '32px auto', padding: '0 24px' },
+  buscaIcone: { fontSize: 14, flexShrink: 0 },
+  buscaLimpar: { background: 'none', border: 'none', color: '#aaa', fontSize: 14, cursor: 'pointer', padding: 4 },
+  categoriasBar: { background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '12px 0' },
+  categoriasScroll: { maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', gap: 10, overflowX: 'auto', alignItems: 'center' },
+  categoriaChip: { padding: '8px 18px', borderRadius: 50, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s', flexShrink: 0 },
+  mainDesktop: { maxWidth: 1200, margin: '32px auto', padding: '0 24px 60px' },
   layout: { display: 'grid', gridTemplateColumns: '240px 1fr', gap: 32, alignItems: 'start' },
   sidebar: { flexDirection: 'column', position: 'sticky', top: 80 },
   sidebarCard: { background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' },
@@ -350,8 +367,15 @@ const styles = {
   conteudoInfo: { display: 'flex', alignItems: 'center', gap: 16 },
   toggleSidebar: { background: 'none', border: '1px solid #ddd', borderRadius: 8, padding: '6px 14px', fontSize: 12, color: '#888', cursor: 'pointer', fontWeight: 600 },
   resultado: { fontSize: 13, color: '#aaa' },
+  filtrosAtivos: { display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 8 },
+  tagAtiva: { background: 'var(--verde)', color: '#fff', padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer' },
+  vazio: { textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: 16 },
+  vazioEmoji: { fontSize: 48, display: 'block', marginBottom: 12 },
+  vazioTitulo: { fontSize: 18, fontWeight: 700, color: 'var(--texto)', marginBottom: 8 },
+  vazioTexto: { fontSize: 14, color: '#aaa', marginBottom: 20 },
+  btnLimparVazio: { background: 'var(--rosa)', color: '#fff', padding: '10px 24px', borderRadius: 50, fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' },
 
-  // ─── MOBILE ───
+  // Mobile
   headerMobile: { background: '#fff', padding: '16px 16px 0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'sticky', top: 64, zIndex: 90, display: 'flex', flexDirection: 'column', gap: 12 },
   headerTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' },
   tituloMobile: { fontSize: 22, fontWeight: 800, color: 'var(--texto)' },
@@ -359,8 +383,8 @@ const styles = {
   btnLimparTopo: { background: 'none', border: '1px solid #ddd', borderRadius: 20, padding: '6px 14px', fontSize: 13, color: 'var(--rosa)', cursor: 'pointer', fontWeight: 600, flexShrink: 0 },
   buscaWrapperMobile: { display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: 50, padding: '0 16px', gap: 8 },
   buscaInputMobile: { flex: 1, border: 'none', background: 'transparent', padding: '11px 0', fontSize: 14, outline: 'none', fontFamily: 'inherit', color: 'var(--texto)' },
-  buscaIcone: { fontSize: 14, flexShrink: 0 },
-  buscaLimpar: { background: 'none', border: 'none', color: '#aaa', fontSize: 14, cursor: 'pointer', padding: 4 },
+  categoriasMobileScroll: { display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' },
+  categoriaChipMobile: { padding: '7px 14px', borderRadius: 50, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s', flexShrink: 0 },
   btnFiltrosMobile: { display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', borderRadius: 12, border: '2px solid #eee', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', width: '100%' },
   filtroBadge: { background: 'var(--rosa)', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 },
   filtrosPainel: { background: '#fafafa', borderRadius: 12, padding: 16, border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 4 },
@@ -369,16 +393,5 @@ const styles = {
   abaIndicador: { position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: 'var(--rosa)', display: 'block' },
   filtrosOpcoes: { display: 'flex', flexWrap: 'wrap', gap: 8 },
   opcaoBtn: { padding: '8px 16px', borderRadius: 50, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' },
-  mainMobile: { padding: '12px 12px 80px', overflowX: 'hidden', width: '100%' },
-  gridMobile: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 },
-
-  // ─── COMPARTILHADOS ───
-  filtrosAtivos: { display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 12 },
-  tagAtiva: { background: 'var(--verde)', color: '#fff', padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 },
-  vazio: { textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' },
-  vazioEmoji: { fontSize: 48, display: 'block', marginBottom: 12 },
-  vazioTitulo: { fontSize: 18, fontWeight: 700, color: 'var(--texto)', marginBottom: 8 },
-  vazioTexto: { fontSize: 14, color: '#aaa', marginBottom: 20 },
-  btnLimparVazio: { background: 'var(--rosa)', color: '#fff', padding: '10px 24px', borderRadius: 50, fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' },
+  mainMobile: { padding: '12px 12px 80px', overflowX: 'hidden', boxSizing: 'border-box' },
 };

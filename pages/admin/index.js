@@ -4,7 +4,7 @@ import UploadFoto from '../../components/UploadFoto';
 import AdminGuard from '../../components/AdminGuard';
 import Link from 'next/link';
 
-const produtoVazio = { nome: '', marca: '', descricao: '', linha: 'feminino', tipo: 'floral', foto: '', destaque: false, ativo: true };
+const produtoVazio = { nome: '', marca: '', descricao: '', linha: 'feminino', tipo: 'floral', categoria: 'perfumaria', foto: '', destaque: false, ativo: true };
 const kitVazio = { nome: '', descricao: '', ocasiao: '', foto: '', ativo: true };
 
 export default function Admin() {
@@ -212,225 +212,234 @@ export default function Admin() {
                 <h2 style={styles.cardTitulo}>{editandoProduto ? '✏️ Editar Produto' : '➕ Novo Produto'}</h2>
                 <div style={styles.grid2}>
                   <div style={styles.campo}>
-                    <label style={styles.label}>Nome *</label>
-                    <input style={styles.input} value={formProduto.nome} onChange={e => setFormProduto({ ...formProduto, nome: e.target.value })} placeholder="Ex: Malbec Gold" />
-                  </div>
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Marca *</label>
-                    <select style={styles.input} value={formProduto.marca} onChange={e => setFormProduto({ ...formProduto, marca: e.target.value })}>
-                      <option value="">Selecione...</option>
-                      {['O Boticário', 'Natura', 'Eudora', 'Avon', 'Mary Kay'].map(m => <option key={m}>{m}</option>)}
+                    <label style={styles.label}>Categoria</label>
+                    <select style={styles.input} value={formProduto.categoria} onChange={e => setFormProduto({ ...formProduto, categoria: e.target.value })}>
+                      <option value="perfumaria">🌸 Perfumaria</option>
+                      <option value="maquiagem">💄 Maquiagem</option>
+                      <option value="corpo_banho">🛁 Corpo e Banho</option>
+                      <option value="skincare">✨ Skincare</option>
+                      <option value="cabelos">🧴 Cabelos</option>
                     </select>
                   </div>
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Linha</label>
-                    <select style={styles.input} value={formProduto.linha} onChange={e => setFormProduto({ ...formProduto, linha: e.target.value })}>
-                      {['feminino', 'masculino', 'kids', 'baby'].map(l => <option key={l}>{l}</option>)}
-                    </select>
-                  </div>
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Tipo</label>
-                    <select style={styles.input} value={formProduto.tipo} onChange={e => setFormProduto({ ...formProduto, tipo: e.target.value })}>
-                      {['floral', 'amadeirado', 'citrico', 'doce', 'frutal'].map(t => <option key={t}>{t}</option>)}
-                    </select>
-                  </div>
-                  <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                    <label style={styles.label}>Descrição</label>
-                    <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formProduto.descricao} onChange={e => setFormProduto({ ...formProduto, descricao: e.target.value })} placeholder="Descreva o produto..." />
-                  </div>
-                  <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                    <UploadFoto fotoAtual={formProduto.foto} onUpload={(url) => setFormProduto({ ...formProduto, foto: url })} />
-                    {formProduto.foto && (
-                      <div style={styles.previewWrapper}>
-                        <img src={formProduto.foto} alt="preview" style={styles.previewImg} />
-                      </div>
-                    )}
-                  </div>
+                  <label style={styles.label}>Nome *</label>
+                  <input style={styles.input} value={formProduto.nome} onChange={e => setFormProduto({ ...formProduto, nome: e.target.value })} placeholder="Ex: Malbec Gold" />
                 </div>
-                <div style={styles.checks}>
-                  <label style={styles.checkLabel}><input type="checkbox" checked={formProduto.destaque} onChange={e => setFormProduto({ ...formProduto, destaque: e.target.checked })} /> ⭐ Destaque na Home</label>
-                  <label style={styles.checkLabel}><input type="checkbox" checked={formProduto.ativo} onChange={e => setFormProduto({ ...formProduto, ativo: e.target.checked })} /> ✅ Ativo</label>
+                <div style={styles.campo}>
+                  <label style={styles.label}>Marca *</label>
+                  <select style={styles.input} value={formProduto.marca} onChange={e => setFormProduto({ ...formProduto, marca: e.target.value })}>
+                    <option value="">Selecione...</option>
+                    {['O Boticário', 'Natura', 'Eudora', 'Avon', 'Mary Kay'].map(m => <option key={m}>{m}</option>)}
+                  </select>
                 </div>
-                <div style={styles.botoes}>
-                  <button style={styles.btnSalvar} onClick={salvarProduto} disabled={salvando}>
-                    {salvando ? 'Salvando...' : editandoProduto ? '💾 Salvar alterações' : '➕ Adicionar produto'}
-                  </button>
-                  {editandoProduto && (
-                    <button style={styles.btnCancelar} onClick={() => { setFormProduto(produtoVazio); setEditandoProduto(null); }}>
-                      Cancelar
-                    </button>
+                <div style={styles.campo}>
+                  <label style={styles.label}>Linha</label>
+                  <select style={styles.input} value={formProduto.linha} onChange={e => setFormProduto({ ...formProduto, linha: e.target.value })}>
+                    {['feminino', 'masculino', 'kids', 'baby'].map(l => <option key={l}>{l}</option>)}
+                  </select>
+                </div>
+                <div style={styles.campo}>
+                  <label style={styles.label}>Tipo</label>
+                  <select style={styles.input} value={formProduto.tipo} onChange={e => setFormProduto({ ...formProduto, tipo: e.target.value })}>
+                    {['floral', 'amadeirado', 'citrico', 'doce', 'frutal'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+                  <label style={styles.label}>Descrição</label>
+                  <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formProduto.descricao} onChange={e => setFormProduto({ ...formProduto, descricao: e.target.value })} placeholder="Descreva o produto..." />
+                </div>
+                <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+                  <UploadFoto fotoAtual={formProduto.foto} onUpload={(url) => setFormProduto({ ...formProduto, foto: url })} />
+                  {formProduto.foto && (
+                    <div style={styles.previewWrapper}>
+                      <img src={formProduto.foto} alt="preview" style={styles.previewImg} />
+                    </div>
                   )}
                 </div>
-              </section>
-
-              <section style={styles.card}>
-                <div style={styles.listaHeader}>
-                  <h2 style={styles.cardTitulo}>📦 Produtos cadastrados ({produtos.length})</h2>
-                  <div style={styles.buscaWrapper}>
-                    <span>🔍</span>
-                    <input
-                      style={styles.buscaInput}
-                      placeholder="Buscar produto..."
-                      value={buscaProduto}
-                      onChange={e => setBuscaProduto(e.target.value)}
-                    />
-                    {buscaProduto && <button style={styles.buscaLimpar} onClick={() => setBuscaProduto('')}>✕</button>}
-                  </div>
-                </div>
-                {buscaProduto && <p style={styles.buscaInfo}>{produtosFiltrados.length} produto(s) encontrado(s)</p>}
-                {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : (
-                  <div style={styles.lista}>
-                    {produtosFiltrados.map(p => (
-                      <div key={p.id} style={{ ...styles.item, opacity: p.ativo ? 1 : 0.5 }}>
-                        {p.foto && <img src={p.foto} alt={p.nome} style={styles.itemFoto} />}
-                        <div style={styles.itemInfo}>
-                          <strong style={{ fontSize: 15 }}>{p.nome}</strong>
-                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
-                            <span style={styles.tag}>{p.marca}</span>
-                            <span style={styles.tag}>{p.linha}</span>
-                            <span style={styles.tag}>{p.tipo}</span>
-                            {p.destaque && <span style={{ ...styles.tag, background: '#fff3cd', color: '#856404' }}>⭐ destaque</span>}
-                            {!p.ativo && <span style={{ ...styles.tag, background: '#f8d7da', color: '#842029' }}>inativo</span>}
-                          </div>
-                        </div>
-                        <div style={styles.itemAcoes}>
-                          <button style={styles.btnToggle} onClick={() => toggleProduto(p)}>{p.ativo ? '⏸️' : '▶️'}</button>
-                          <button style={styles.btnEditar} onClick={() => editarProduto(p)}>✏️ Editar</button>
-                          <button style={styles.btnExcluir} onClick={() => excluirProduto(p.id)}>🗑️</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              </div>
+              <div style={styles.checks}>
+                <label style={styles.checkLabel}><input type="checkbox" checked={formProduto.destaque} onChange={e => setFormProduto({ ...formProduto, destaque: e.target.checked })} /> ⭐ Destaque na Home</label>
+                <label style={styles.checkLabel}><input type="checkbox" checked={formProduto.ativo} onChange={e => setFormProduto({ ...formProduto, ativo: e.target.checked })} /> ✅ Ativo</label>
+              </div>
+              <div style={styles.botoes}>
+                <button style={styles.btnSalvar} onClick={salvarProduto} disabled={salvando}>
+                  {salvando ? 'Salvando...' : editandoProduto ? '💾 Salvar alterações' : '➕ Adicionar produto'}
+                </button>
+                {editandoProduto && (
+                  <button style={styles.btnCancelar} onClick={() => { setFormProduto(produtoVazio); setEditandoProduto(null); }}>
+                    Cancelar
+                  </button>
                 )}
-              </section>
-            </>
+              </div>
+            </section>
+
+          <section style={styles.card}>
+            <div style={styles.listaHeader}>
+              <h2 style={styles.cardTitulo}>📦 Produtos cadastrados ({produtos.length})</h2>
+              <div style={styles.buscaWrapper}>
+                <span>🔍</span>
+                <input
+                  style={styles.buscaInput}
+                  placeholder="Buscar produto..."
+                  value={buscaProduto}
+                  onChange={e => setBuscaProduto(e.target.value)}
+                />
+                {buscaProduto && <button style={styles.buscaLimpar} onClick={() => setBuscaProduto('')}>✕</button>}
+              </div>
+            </div>
+            {buscaProduto && <p style={styles.buscaInfo}>{produtosFiltrados.length} produto(s) encontrado(s)</p>}
+            {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : (
+              <div style={styles.lista}>
+                {produtosFiltrados.map(p => (
+                  <div key={p.id} style={{ ...styles.item, opacity: p.ativo ? 1 : 0.5 }}>
+                    {p.foto && <img src={p.foto} alt={p.nome} style={styles.itemFoto} />}
+                    <div style={styles.itemInfo}>
+                      <strong style={{ fontSize: 15 }}>{p.nome}</strong>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                        <span style={styles.tag}>{p.marca}</span>
+                        <span style={styles.tag}>{p.linha}</span>
+                        <span style={styles.tag}>{p.tipo}</span>
+                        {p.destaque && <span style={{ ...styles.tag, background: '#fff3cd', color: '#856404' }}>⭐ destaque</span>}
+                        {!p.ativo && <span style={{ ...styles.tag, background: '#f8d7da', color: '#842029' }}>inativo</span>}
+                      </div>
+                    </div>
+                    <div style={styles.itemAcoes}>
+                      <button style={styles.btnToggle} onClick={() => toggleProduto(p)}>{p.ativo ? '⏸️' : '▶️'}</button>
+                      <button style={styles.btnEditar} onClick={() => editarProduto(p)}>✏️ Editar</button>
+                      <button style={styles.btnExcluir} onClick={() => excluirProduto(p.id)}>🗑️</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
           )}
 
-          {/* ─── ABA KITS ─── */}
-          {aba === 'kits' && (
-            <>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitulo}>{editandoKit ? '✏️ Editar Kit' : '➕ Novo Kit'}</h2>
-                <div style={styles.grid2}>
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Nome do Kit *</label>
-                    <input style={styles.input} value={formKit.nome} onChange={e => setFormKit({ ...formKit, nome: e.target.value })} placeholder="Ex: Kit Dia das Mães" />
-                  </div>
-                  <div style={styles.campo}>
-                    <label style={styles.label}>Ocasião</label>
-                    <input style={styles.input} value={formKit.ocasiao} onChange={e => setFormKit({ ...formKit, ocasiao: e.target.value })} placeholder="Ex: Dia das Mães, Aniversário..." />
-                  </div>
-                  <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                    <label style={styles.label}>Descrição</label>
-                    <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formKit.descricao} onChange={e => setFormKit({ ...formKit, descricao: e.target.value })} placeholder="Descreva o kit..." />
-                  </div>
-                  <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
-                    <UploadFoto fotoAtual={formKit.foto} onUpload={(url) => setFormKit({ ...formKit, foto: url })} />
-                    {formKit.foto && (
-                      <div style={styles.previewWrapper}>
-                        <img src={formKit.foto} alt="preview" style={styles.previewImg} />
-                      </div>
-                    )}
-                  </div>
+        {/* ─── ABA KITS ─── */}
+        {aba === 'kits' && (
+          <>
+            <section style={styles.card}>
+              <h2 style={styles.cardTitulo}>{editandoKit ? '✏️ Editar Kit' : '➕ Novo Kit'}</h2>
+              <div style={styles.grid2}>
+                <div style={styles.campo}>
+                  <label style={styles.label}>Nome do Kit *</label>
+                  <input style={styles.input} value={formKit.nome} onChange={e => setFormKit({ ...formKit, nome: e.target.value })} placeholder="Ex: Kit Dia das Mães" />
                 </div>
-
-                {/* Busca de produtos para o kit */}
-                <div style={{ marginTop: 24 }}>
-                  <label style={styles.label}>Produtos do Kit ({produtosDoKit.length} selecionados)</label>
-                  <div style={{ ...styles.buscaWrapper, margin: '10px 0' }}>
-                    <span>🔍</span>
-                    <input
-                      style={styles.buscaInput}
-                      placeholder="Buscar produto para o kit..."
-                      value={buscaProdutoKit}
-                      onChange={e => setBuscaProdutoKit(e.target.value)}
-                    />
-                    {buscaProdutoKit && <button style={styles.buscaLimpar} onClick={() => setBuscaProdutoKit('')}>✕</button>}
-                  </div>
-                  <div style={styles.gridSelecao}>
-                    {produtosParaKit.map(p => {
-                      const selecionado = produtosDoKit.includes(p.id);
-                      return (
-                        <div
-                          key={p.id}
-                          style={{ ...styles.cardSelecao, border: selecionado ? '2px solid var(--verde)' : '2px solid #eee', background: selecionado ? '#f0f4ea' : '#fff' }}
-                          onClick={() => toggleProdutoKit(p.id)}
-                        >
-                          <span style={{ ...styles.checkSelecao, background: selecionado ? '#78825B' : '#ddd' }}>
-                            {selecionado ? '✓' : '+'}
-                          </span>
-                          <div>
-                            <p style={{ fontWeight: 600, fontSize: 13 }}>{p.nome}</p>
-                            <p style={{ fontSize: 11, color: '#888' }}>{p.marca}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {produtosParaKit.length === 0 && (
-                      <p style={{ color: '#aaa', fontSize: 13, padding: '8px 0' }}>Nenhum produto encontrado</p>
-                    )}
-                  </div>
+                <div style={styles.campo}>
+                  <label style={styles.label}>Ocasião</label>
+                  <input style={styles.input} value={formKit.ocasiao} onChange={e => setFormKit({ ...formKit, ocasiao: e.target.value })} placeholder="Ex: Dia das Mães, Aniversário..." />
                 </div>
-
-                <div style={styles.checks}>
-                  <label style={styles.checkLabel}><input type="checkbox" checked={formKit.ativo} onChange={e => setFormKit({ ...formKit, ativo: e.target.checked })} /> ✅ Kit ativo</label>
+                <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+                  <label style={styles.label}>Descrição</label>
+                  <textarea style={{ ...styles.input, height: 80, resize: 'vertical' }} value={formKit.descricao} onChange={e => setFormKit({ ...formKit, descricao: e.target.value })} placeholder="Descreva o kit..." />
                 </div>
-                <div style={styles.botoes}>
-                  <button style={styles.btnSalvar} onClick={salvarKit} disabled={salvando}>
-                    {salvando ? 'Salvando...' : editandoKit ? '💾 Salvar Kit' : '➕ Criar Kit'}
-                  </button>
-                  {editandoKit && (
-                    <button style={styles.btnCancelar} onClick={() => { setFormKit(kitVazio); setEditandoKit(null); setProdutosDoKit([]); }}>
-                      Cancelar
-                    </button>
+                <div style={{ ...styles.campo, gridColumn: '1 / -1' }}>
+                  <UploadFoto fotoAtual={formKit.foto} onUpload={(url) => setFormKit({ ...formKit, foto: url })} />
+                  {formKit.foto && (
+                    <div style={styles.previewWrapper}>
+                      <img src={formKit.foto} alt="preview" style={styles.previewImg} />
+                    </div>
                   )}
                 </div>
-              </section>
+              </div>
 
-              <section style={styles.card}>
-                <div style={styles.listaHeader}>
-                  <h2 style={styles.cardTitulo}>🎁 Kits cadastrados ({kits.length})</h2>
-                  <div style={styles.buscaWrapper}>
-                    <span>🔍</span>
-                    <input
-                      style={styles.buscaInput}
-                      placeholder="Buscar kit..."
-                      value={buscaKit}
-                      onChange={e => setBuscaKit(e.target.value)}
-                    />
-                    {buscaKit && <button style={styles.buscaLimpar} onClick={() => setBuscaKit('')}>✕</button>}
-                  </div>
+              {/* Busca de produtos para o kit */}
+              <div style={{ marginTop: 24 }}>
+                <label style={styles.label}>Produtos do Kit ({produtosDoKit.length} selecionados)</label>
+                <div style={{ ...styles.buscaWrapper, margin: '10px 0' }}>
+                  <span>🔍</span>
+                  <input
+                    style={styles.buscaInput}
+                    placeholder="Buscar produto para o kit..."
+                    value={buscaProdutoKit}
+                    onChange={e => setBuscaProdutoKit(e.target.value)}
+                  />
+                  {buscaProdutoKit && <button style={styles.buscaLimpar} onClick={() => setBuscaProdutoKit('')}>✕</button>}
                 </div>
-                {buscaKit && <p style={styles.buscaInfo}>{kitsFiltrados.length} kit(s) encontrado(s)</p>}
-                {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : kitsFiltrados.length === 0 ? (
-                  <p style={{ color: '#aaa' }}>Nenhum kit encontrado.</p>
-                ) : (
-                  <div style={styles.lista}>
-                    {kitsFiltrados.map(k => (
-                      <div key={k.id} style={{ ...styles.item, opacity: k.ativo ? 1 : 0.5 }}>
-                        {k.foto && <img src={k.foto} alt={k.nome} style={styles.itemFoto} />}
-                        <div style={styles.itemInfo}>
-                          <strong style={{ fontSize: 15 }}>{k.nome}</strong>
-                          <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
-                            {k.ocasiao && <span style={styles.tag}>{k.ocasiao}</span>}
-                            <span style={styles.tag}>{k.kit_produtos?.length || 0} produtos</span>
-                            {!k.ativo && <span style={{ ...styles.tag, background: '#f8d7da', color: '#842029' }}>inativo</span>}
-                          </div>
-                        </div>
-                        <div style={styles.itemAcoes}>
-                          <button style={styles.btnEditar} onClick={() => editarKit(k)}>✏️ Editar</button>
-                          <button style={styles.btnExcluir} onClick={() => excluirKit(k.id)}>🗑️</button>
+                <div style={styles.gridSelecao}>
+                  {produtosParaKit.map(p => {
+                    const selecionado = produtosDoKit.includes(p.id);
+                    return (
+                      <div
+                        key={p.id}
+                        style={{ ...styles.cardSelecao, border: selecionado ? '2px solid var(--verde)' : '2px solid #eee', background: selecionado ? '#f0f4ea' : '#fff' }}
+                        onClick={() => toggleProdutoKit(p.id)}
+                      >
+                        <span style={{ ...styles.checkSelecao, background: selecionado ? '#78825B' : '#ddd' }}>
+                          {selecionado ? '✓' : '+'}
+                        </span>
+                        <div>
+                          <p style={{ fontWeight: 600, fontSize: 13 }}>{p.nome}</p>
+                          <p style={{ fontSize: 11, color: '#888' }}>{p.marca}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
+                  {produtosParaKit.length === 0 && (
+                    <p style={{ color: '#aaa', fontSize: 13, padding: '8px 0' }}>Nenhum produto encontrado</p>
+                  )}
+                </div>
+              </div>
+
+              <div style={styles.checks}>
+                <label style={styles.checkLabel}><input type="checkbox" checked={formKit.ativo} onChange={e => setFormKit({ ...formKit, ativo: e.target.checked })} /> ✅ Kit ativo</label>
+              </div>
+              <div style={styles.botoes}>
+                <button style={styles.btnSalvar} onClick={salvarKit} disabled={salvando}>
+                  {salvando ? 'Salvando...' : editandoKit ? '💾 Salvar Kit' : '➕ Criar Kit'}
+                </button>
+                {editandoKit && (
+                  <button style={styles.btnCancelar} onClick={() => { setFormKit(kitVazio); setEditandoKit(null); setProdutosDoKit([]); }}>
+                    Cancelar
+                  </button>
                 )}
-              </section>
-            </>
-          )}
-        </main>
-      </div>
-    </AdminGuard>
+              </div>
+            </section>
+
+            <section style={styles.card}>
+              <div style={styles.listaHeader}>
+                <h2 style={styles.cardTitulo}>🎁 Kits cadastrados ({kits.length})</h2>
+                <div style={styles.buscaWrapper}>
+                  <span>🔍</span>
+                  <input
+                    style={styles.buscaInput}
+                    placeholder="Buscar kit..."
+                    value={buscaKit}
+                    onChange={e => setBuscaKit(e.target.value)}
+                  />
+                  {buscaKit && <button style={styles.buscaLimpar} onClick={() => setBuscaKit('')}>✕</button>}
+                </div>
+              </div>
+              {buscaKit && <p style={styles.buscaInfo}>{kitsFiltrados.length} kit(s) encontrado(s)</p>}
+              {carregando ? <p style={{ color: '#aaa' }}>Carregando...</p> : kitsFiltrados.length === 0 ? (
+                <p style={{ color: '#aaa' }}>Nenhum kit encontrado.</p>
+              ) : (
+                <div style={styles.lista}>
+                  {kitsFiltrados.map(k => (
+                    <div key={k.id} style={{ ...styles.item, opacity: k.ativo ? 1 : 0.5 }}>
+                      {k.foto && <img src={k.foto} alt={k.nome} style={styles.itemFoto} />}
+                      <div style={styles.itemInfo}>
+                        <strong style={{ fontSize: 15 }}>{k.nome}</strong>
+                        <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                          {k.ocasiao && <span style={styles.tag}>{k.ocasiao}</span>}
+                          <span style={styles.tag}>{k.kit_produtos?.length || 0} produtos</span>
+                          {!k.ativo && <span style={{ ...styles.tag, background: '#f8d7da', color: '#842029' }}>inativo</span>}
+                        </div>
+                      </div>
+                      <div style={styles.itemAcoes}>
+                        <button style={styles.btnEditar} onClick={() => editarKit(k)}>✏️ Editar</button>
+                        <button style={styles.btnExcluir} onClick={() => excluirKit(k.id)}>🗑️</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+    </AdminGuard >
   );
 }
 
