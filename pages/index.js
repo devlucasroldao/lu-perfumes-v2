@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } = from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import ProdutoCard from '../components/ProdutoCard';
 import Link from 'next/link';
@@ -266,34 +266,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      <style>{`
-        .grid-home {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
-          align-items: stretch;
-        }
-        .grid-home > div {
-          min-width: 0;
-          display: flex;
-          flex-direction: column;
-        }
-        .grid-home > div > a {
-          flex: 1;
-        }
-        @media (max-width: 1024px) {
-          .grid-home { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 768px) {
-          .grid-home { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        }
-        @media (max-width: 480px) {
-          .grid-home { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        }
-        /* Esconde scrollbar */
-        .filtros-scroll::-webkit-scrollbar { display: none; }
-      `}</style>
     </div>
   );
 }
